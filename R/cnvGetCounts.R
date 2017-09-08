@@ -24,7 +24,7 @@
 #' 
 #' @import Rsamtools 
 #' @import data.table
-#' @importFrom IRanges IRanges findOverlapPairs
+#' @import IRanges 
 #' @importFrom GenomicRanges elementMetadata<-
 #' @export 
 
