@@ -26,6 +26,7 @@
 #' @import data.table
 #' @import IRanges 
 #' @importFrom GenomicRanges elementMetadata<-
+#' @importFrom utils strcapture
 #' @export 
 
 
