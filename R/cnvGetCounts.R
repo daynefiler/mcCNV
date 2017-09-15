@@ -22,11 +22,11 @@
 #' 
 #' @return IRanges object with reference intervals
 #' 
+#' @import utils
 #' @import Rsamtools 
 #' @import data.table
 #' @import IRanges 
 #' @importFrom GenomicRanges elementMetadata<-
-#' @importFrom utils strcapture
 #' @export 
 
 
