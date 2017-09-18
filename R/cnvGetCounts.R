@@ -26,7 +26,7 @@
 #' @import Rsamtools 
 #' @import data.table
 #' @import IRanges 
-#' @importFrom GenomicRanges elementMetadata<-
+#' @import GenomicRanges
 #' @export 
 
 
