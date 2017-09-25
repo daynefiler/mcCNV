@@ -109,7 +109,7 @@ cnvGetCounts <- function(bamfile, intfile, refname,
   rds <- cnvReadBam(bamfile = bamfile, 
                     what = flds, 
                     tags = tags, 
-                    which = IRangesList(ref),
+                    which = ref,
                     keyby = "qname")
   setorder(rds, qname, strand)
   if (verbose) cat("done.\n")
