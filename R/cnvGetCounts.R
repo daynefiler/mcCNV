@@ -164,10 +164,13 @@ cnvGetCounts <- function(bamfile, intfile, refname,
   
   prs[ , wt := 1/.N, by = mol]
   cts <- prs[ , 
-              list(N = .N, 
+              list(N = sum(wt), 
                    hang = length(which(lf != 3)), 
                    mult = length(which(wt < 1))),
               by = ref]
+  setkey(cts, ref)
+  cts <- cts[names(intRng)]
+  cts[is.na(N), N:= 0]
   if (verbose) cat("done.\n")
   
   ## Write ouputs
