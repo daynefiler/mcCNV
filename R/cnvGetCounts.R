@@ -130,9 +130,10 @@ cnvGetCounts <- function(bamfile, intfile, refname,
   rds[ , ff := ff + any(mapq < 20, na.rm = TRUE)*2L, by = qname]
   rds[ , ff := ff + (!any(is.na(XA)))*4L, by = qname]
   rds[rname != mrnm, ff := ff + 8L]
-  rds[ , ff := ff + (pos[1] > pos[2])*16L, by = qname]
-  isize_break <- rds[strand == "+", 
-                   median(isize, na.rm = TRUE) + 5*mad(isize, na.rm = TRUE)]
+  rds[!bitwAnd(ff, 1) & ! bitwAnd(ff, 8), 
+      ff := ff + (pos[1] > pos[2])*16L, by = qname]
+  isize_break <- rds[strand == "+",
+                     median(isize, na.rm = TRUE) + 5*mad(isize, na.rm = TRUE)]
   rds[abs(isize) > isize_break, ff := ff + 32L]
   if (verbose) cat("done.\n")
   
