@@ -40,6 +40,7 @@ cnvGenSmpl <- function(nr, pe, cw, seed = NULL,
   if (cw > 1) {
     ind <- which(states != 1)
     states[sapply(ind, seq, length = cw)] <- rep(states[ind], each = cw)
+    states <- states[seq(ne)]
   }
   adj_pe <- states*pe
   adj_pe <- adj_pe/sum(adj_pe)
@@ -49,5 +50,6 @@ cnvGenSmpl <- function(nr, pe, cw, seed = NULL,
   res <- res[J(1:ne), ]
   res[is.na(N), N := 0]
   res[ , act_cnvs := states]
+  res[]
   
 }
