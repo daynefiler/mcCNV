@@ -105,11 +105,15 @@
 #' @details 
 #' Need to add
 #' 
+#' @importFrom Rfast rowMaxs
 #' @import data.table
 
 .callCN <- function(cnts, min.dlt, max.its, prior) {
   
   cnts[ , CN := 1]
+  
+  cs <- c(0.001, 0.5, 1, 1.5, 2.0, 2.5, 3.0, 3.5, 4)
+  cp <- rep(prior, length(cs)); cp[which(cs == 1)] <- 1 - prior
   
   it <- 1
   repeat {
@@ -126,7 +130,7 @@
                     by = ref]
     shrPhi[is.na(vr), vr := mn]
     shrPhi[ , phi := (n*vr + mn*inv_sf)/(mn^2*inv_sf), by = ref]
-    shrPhi[ , phi_shr := .calcShrPhi(phi)]
+    shrPhi[ , phi_shr := cnvR:::.calcShrPhi(phi)]
     shrPhi[ , phi_mn  := mean(phi)]
     shrPhi[ , phi_cp := phi]
     shrPhi[phi_cp > quantile(0.95, phi_cp), phi_cp := quantile(0.95, phi_cp)]
@@ -135,7 +139,13 @@
     cnts <- shrPhi[ , list(ref, phi, phi_shr, phi_mn, phi_cp)][cnts]
     setkey(cnts, sbj, ref)
     cnts[ , oldCN := CN]
-    cnts[ , CN := .calcMLCN(N, mn, sf, phi_shr, prior), by = list(sbj, ref)]
+    calcProb <- function(x) cnts[ , pnbinom(N, sf/phi, 1/(mn*phi*x + 1))]
+    probMat <- do.call(cbind, lapply(cs, calcProb))
+    ind <- which(probMat > 0.5, arr.ind = TRUE)
+    probMat[ind] <- 1 - probMat[ind]
+    probMat <- sweep(probMat, 2, cp, "*")
+    cnts[ , CN := cs[rowMaxs(probMat)]]
+    cnts[ , lk := rowMaxs(probMat, value = TRUE)]
     nchng <- cnts[oldCN != CN, .N]
     
     if (nchng < min.dlt | it == max.its) break
