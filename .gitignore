@@ -36,3 +36,8 @@ vignettes/*.pdf
 
 # Compiled files
 inst/*.o
+src/*.o
+src/*.so
+
+# Junk files
+inst/junk/*
