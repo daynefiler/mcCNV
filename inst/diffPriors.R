@@ -49,12 +49,12 @@ doCalc <- function(prior, dep, cw, rep, wdir) {
 
 res <- slurm_apply(f = doCalc, 
                    params = pars, 
-                   nodes = 400,
-                   cpus_per_node = 5,
+                   nodes = 2000,
+                   cpus_per_node = 1,
                    jobname = "cnvDiffPrior", 
-                   slurm_options = list(mem = 16000,
+                   slurm_options = list(mem = 32000,
                                         'cpus-per-task' = 1,
                                         error = "cnvDiffPrior-err.txt",
-                                        time = "96:00:00"))
+                                        time = "240:00:00"))
 
 

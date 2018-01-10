@@ -50,7 +50,9 @@ cnvCallCN <- function(cnts, prior, width = 5, min.dlt = 20, max.its = 30,
   if (is.null(outfile)) {
     return(cnts[])
   } else {
-    saveRDS(cnts, file = outfile)
+    cols <- c("ref", "sbj", "N", "CN", "lk")
+    if (!is.null(cnts$actCN)) cols <- c(cols, "actCN")
+    saveRDS(cnts[ , .SD, .SDcols = cols], file = outfile)
     return(TRUE)
   }
   
