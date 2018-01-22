@@ -133,7 +133,7 @@
     shrPhi[ , phi_shr := cnvR:::.calcShrPhi(phi)]
     shrPhi[ , phi_mn  := mean(phi)]
     shrPhi[ , phi_cp := phi]
-    shrPhi[phi_cp > quantile(0.95, phi_cp), phi_cp := quantile(0.95, phi_cp)]
+    shrPhi[phi_cp > quantile(phi_cp, 0.95), phi_cp := quantile(phi_cp, 0.95)]
     setkey(cnts, ref)
     setkey(shrPhi, ref)
     cnts <- shrPhi[ , list(ref, phi, phi_shr, phi_mn, phi_cp)][cnts]
