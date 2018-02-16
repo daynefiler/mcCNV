@@ -25,7 +25,7 @@
 # cnts <- readRDS("~/Desktop/sub/sim_d100_w1_r0001.RDS"); prior <- 0.05; width <- 4; min.dlt <- 20; max.its <- 30
 # cnts <- readRDS("d100/w1/sim_d100_w1_r0001.RDS"); prior <- 0.05; width <- 6; min.dlt <- 20; max.its <- 30
 cnvCallCN <- function(cnts, prior, width = 5, min.dlt = 20, max.its = 30, 
-                      outfile = NULL) {
+                      outfile = NULL, agg = FALSE) {
   
   if (is.data.frame(cnts)) {
     if (!is.data.table(cnts)) cnts <- as.data.table(cnts)
@@ -45,6 +45,9 @@ cnvCallCN <- function(cnts, prior, width = 5, min.dlt = 20, max.its = 30,
                    mc.cores = width)
   its <- sapply(cnts, attr, which = "its")
   cnts <- rbindlist(cnts)
+  
+  if (agg) cnts <- cnvAggCall(cnts)
+  
   setattr(cnts, "its", its)
   
   if (is.null(outfile)) {

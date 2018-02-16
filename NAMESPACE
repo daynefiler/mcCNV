@@ -2,6 +2,7 @@
 
 export(callMLCN)
 export(cigar2rlen)
+export(cnvAggCall)
 export(cnvCallCN)
 export(cnvGenPool)
 export(cnvGenSmpl)
