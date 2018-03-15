@@ -48,7 +48,7 @@ cnvGenSmpl <- function(nr, pe, cw, seed = NULL,
   setkey(res, ref)
   res <- res[J(1:ne), ]
   res[is.na(N), N := 0]
-  res[ , act_cnvs := states]
+  res[ , actCN := states]
   res[]
   
 }
