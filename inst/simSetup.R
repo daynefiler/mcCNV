@@ -8,11 +8,11 @@ library(data.table)
 
 ## Setup simulation
 ## Directory for storing the data
-fdir <- file.path("/", "projects", "sequence_analysis", "vol4", 
+fdir <- file.path("/", "projects", "sequence_analysis", "vol5", 
                   "dfiler", "cnvR", "simData")
 deps <- seq(5, 100, 5) ## Sequencing depths 
 cw <- 1:5 ## Sizes of cnvs (number of exons spanned) 
-reps <- 1000 ## Number of repetitions 
+reps <- 200 ## Number of repetitions 
 Ne <- 172000 ## Number of exons
 Ns <- 16 ## Number of samples
 
@@ -38,13 +38,17 @@ savePool <- function(Ns, Ne, dep, cw, rep, seed, fdir) {
 
 res <- slurm_apply(f = savePool, 
                    params = simPars, 
-                   nodes = 1000,
+                   nodes = nrow(pars),
                    cpus_per_node = 1,
-                   jobname = "cnvGenPools", 
-                   slurm_options = list(mem = 16000,
+                   jobname = "genSmpls",
+                   slurm_options = list(mem = 12000,
+                                        array = sprintf("0-%d%%%d",
+                                                        nrow(pars) - 1,
+                                                        1000),
                                         'cpus-per-task' = 1,
-                                        error = "cnvGenPools-err.txt",
-                                        time = "24:00:00"))
+                                        error =  "%A_%a.err",
+                                        output = "%A_%a.out",
+                                        time = "96:00:00"))
 
 
 

@@ -14,7 +14,6 @@
 #' @param cw integer of length 1, the width (number of exons) the cnv spans
 #' @param seed numeric of length 1, the starting seed for the random number
 #' generator, can be left NULL
-#' @param seed.smpl logical, should the sample seed be given?
 #' 
 #' @details 
 #' The number of molecules per sample is drawn from a uniform distribution with
