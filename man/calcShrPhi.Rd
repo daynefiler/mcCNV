@@ -3,33 +3,13 @@
 \name{calcShrPhi}
 \alias{calcShrPhi}
 \alias{.calcShrPhi}
-\alias{calcShrPhi}
-\alias{.calcMLCN}
 \title{Shrink phi values}
 \usage{
 .calcShrPhi(phi)
-
-.calcMLCN(N, mu, sf, phi, prior)
 }
 \arguments{
 \item{phi}{numeric, the phi values to shrink}
-
-\item{N}{integer of length 1, the molecule counts for the subject}
-
-\item{mu}{numeric of length 1, the locus mean counts for the group}
-
-\item{sf}{numeric of length 1, the size-factor adjustment for the subject}
-
-\item{prior}{numeric of length 1, the prior probabilty of having a CNV}
-
-\item{phi}{numeric of length 1, the locus phi/dispersion value for the group}
-}
-\value{
-list, first element gives the most likely copy number-state and 
-the second element gives the likelihood value
 }
 \details{
 Need to add.
-
-Need to add
 }

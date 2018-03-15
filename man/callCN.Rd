@@ -5,7 +5,7 @@
 \alias{.callCN}
 \title{Call copy number-state}
 \usage{
-.callCN(cnts, min.dlt, max.its, prior)
+.callCN(cnts, min.dlt, max.its, prior, shrink = TRUE)
 }
 \arguments{
 \item{cnts}{data.table object containing the counts}
@@ -16,6 +16,8 @@ state to stop the alogorithm}
 \item{max.its}{integer of length 1, the maximum number of iterations}
 
 \item{prior}{numeric of length 1, the prior probability of having a CNV}
+
+\item{shrink}{logical of length 1, shrinkage applied to phi when TRUE}
 }
 \details{
 Need to add

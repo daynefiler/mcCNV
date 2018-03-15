@@ -4,7 +4,7 @@
 \alias{cnvAggCall}
 \title{Aggregate CN-state calls from different widths to single call}
 \usage{
-cnvAggCall(dat, width = 5)
+cnvAggCall(dat, width = 5, weight = FALSE)
 }
 \arguments{
 \item{dat}{the input data, see details}

@@ -5,7 +5,8 @@
 \title{Call copy number-state for the given data}
 \usage{
 cnvCallCN(cnts, prior, width = 5, min.dlt = 20, max.its = 30,
-  outfile = NULL, agg = FALSE)
+  outfile = NULL, agg = FALSE, shrink = TRUE, keep.cols = NULL,
+  verbose = FALSE)
 }
 \arguments{
 \item{cnts}{the input data, see details}
@@ -22,6 +23,8 @@ state to stop the alogorithm}
 
 \item{outfile}{character of length 1, when not NULL, save .RDS file to the
 file given}
+
+\item{shrink}{logical of length 1, shrinkage applied to phi when TRUE}
 }
 \details{
 Need to add

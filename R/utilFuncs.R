@@ -18,8 +18,8 @@
   asd <- sapply(xi, function(x) 0.05/sum((phi - x)^2))
   xi <- xi[which.min(diff(asd)/diff(xi))]
   dlt <- (sum((phi - mean(phi))^2)/(nPhi - 1))/(sum((phi - xi)^2)/(nPhi - 2))
-  phi_shr <- (1 - dlt)*phi + dlt*xi
-  phi_shr
+  sPhi <- (1 - dlt)*phi + dlt*xi
+  sPhi
   
 }
 
@@ -27,7 +27,7 @@
 ## .calcShrPhi: Calculate the MLCN-state for a subject
 ##----------------------------------------------------------------------------##
 
-#' @name calcShrPhi
+#' @name calcMLCN
 #' @title Calculate the maximum likelihood copy number-state for a subject
 #' 
 #' @param N integer of length 1, the molecule counts for the subject
@@ -85,6 +85,7 @@
   }
   dat[ , grep("_lead_", colnames(dat), value = TRUE) := NULL]
   dat <- dat[!is.na(N)]
+  dat[ , width := cw]
   dat[]
   
 }
@@ -101,6 +102,7 @@
 #' @param min.dlt integer of length 1, the target number of changes in copy-
 #' state to stop the alogorithm 
 #' @param max.its integer of length 1, the maximum number of iterations
+#' @param shrink logical of length 1, shrinkage applied to phi when TRUE
 #' 
 #' @details 
 #' Need to add
@@ -108,7 +110,7 @@
 #' @importFrom Rfast rowMaxs
 #' @import data.table
 
-.callCN <- function(cnts, min.dlt, max.its, prior) {
+.callCN <- function(cnts, min.dlt, max.its, prior, shrink = TRUE) {
   
   cnts[ , CN := 1]
   
@@ -121,34 +123,35 @@
     cnts[ , adjN := N/CN]
     cnts[ , use := CN > 0.001 & adjN > 10]
     cnts[ , geomn := exp(mean(log(adjN[use]))), by = ref]
-    cnts[ , sf := median(adjN/geomn, na.rm = TRUE), by = sbj]
+    cnts[ , sf := median(adjN/geomn, na.rm = TRUE), by = list(sbj, width)]
     cnts[ , mn := mean(adjN[use]/sf[use]), by = ref]
     cnts[ , vr :=  var(adjN[use]/sf[use]), by = ref]
     
     shrPhi <- cnts[ , 
-                    list(n = .N, mn = mn[1], vr = vr[1], inv_sf = sum(1/sf)), 
-                    by = ref]
+                    list(n = .N, mn = mn[1], vr = vr[1], isf = sum(1/sf)), 
+                    by = list(ref, width)]
     shrPhi[is.na(vr), vr := mn]
-    shrPhi[ , phi := (n*vr + mn*inv_sf)/(mn^2*inv_sf), by = ref]
-    shrPhi[ , phi_shr := cnvR:::.calcShrPhi(phi)]
+    shrPhi[ , phi := (n*vr + mn*isf)/(mn^2*isf), by = ref]
+    if (shrink) shrPhi[ , phi := .calcShrPhi(phi), by = width]
     setkey(cnts, ref)
     setkey(shrPhi, ref)
-    cnts <- shrPhi[ , list(ref, phi, phi_shr)][cnts]
+    cnts <- shrPhi[ , list(ref, phi)][cnts]
     setkey(cnts, sbj, ref)
     cnts[ , oldCN := CN]
-    calcProb <- function(x) cnts[ , pnbinom(N, sf/phi_shr, 1/(mn*phi_shr*x + 1))]
+    calcProb <- function(x) cnts[ , pnbinom(N, sf/phi, 1/(mn*phi*x + 1))]
     probMat <- do.call(cbind, lapply(cs, calcProb))
     ind <- which(probMat > 0.5, arr.ind = TRUE)
     probMat[ind] <- 1 - probMat[ind]
     probMat <- sweep(probMat, 2, cp, "*")
     cnts[ , CN := cs[rowMaxs(probMat)]]
     cnts[ , lk := rowMaxs(probMat, value = TRUE)]
+    rm(probMat); gc()
     nchng <- cnts[oldCN != CN, .N]
     
     if (nchng < min.dlt | it == max.its) break
     
     it <- it + 1
-    cnts[ , c("phi", "phi_shr", "phi_mn") := NULL]
+    cnts[ , phi := NULL]
     
   }
   
@@ -157,29 +160,4 @@
   cnts[]
   
 }
-
-# slctCall <- function(dat, col.grep = "p[0-9]") {
-#   
-#   cols <- grep(col.grep, names(dat), value = TRUE)
-#   dat <- rbindlist(lapply(cols, getSngl, dat = dat))
-#   dat[ , (cols) := NULL]
-#   setorder(dat, sngl)
-#   dat[ , CNCall := any(CN != 1), by = sngl]
-#   if (any(grepl("actCN", colnames(dat)))) {
-#     dat[ ,
-#          actCNSngl := actCN[wd == 1], 
-#          by = sngl]
-#   }
-#   dat <- split(dat, by = "CNCall")
-#   setorder(dat[["FALSE"]], sngl,  lk)
-#   dat[["TRUE"]] <- dat[["TRUE"]][CN != 1]
-#   setorder(dat[["TRUE"]],  sngl, -lk)
-#   dat <- rbindlist(dat)
-#   ind <- dat[ , list(ind = .I[1]), by = sngl]
-#   dat <- dat[ind$ind]
-#   rm(ind)
-#   
-#   dat[]
-#   
-# }
 
