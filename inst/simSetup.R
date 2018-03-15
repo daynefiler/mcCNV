@@ -21,10 +21,10 @@ dir.create(fdir)
 depDir <- sprintf("d%0.3d/w%0.1d", rep(deps, each = length(cw)), cw)
 sapply(file.path(fdir, depDir), dir.create, recursive = TRUE)
 
-set.seed(1234)
 simPars <- expand.grid(Ns = Ns, Ne = Ne, dep = deps, 
                        cw = cw, rep = seq(reps), fdir = fdir)
 simPars <- as.data.table(simPars)
+set.seed(1234)
 simPars[ , seed := sample(1e6, .N)]
 
 savePool <- function(Ns, Ne, dep, cw, rep, seed, fdir) {
@@ -36,19 +36,19 @@ savePool <- function(Ns, Ne, dep, cw, rep, seed, fdir) {
   !is(smpls, 'try-error')
 }
 
-res <- slurm_apply(f = savePool, 
-                   params = simPars, 
-                   nodes = nrow(pars),
-                   cpus_per_node = 1,
-                   jobname = "genSmpls",
-                   slurm_options = list(mem = 12000,
-                                        array = sprintf("0-%d%%%d",
-                                                        nrow(pars) - 1,
-                                                        1000),
-                                        'cpus-per-task' = 1,
-                                        error =  "%A_%a.err",
-                                        output = "%A_%a.out",
-                                        time = "96:00:00"))
+slurm_apply(f = savePool, 
+            params = simPars, 
+            nodes = nrow(pars),
+            cpus_per_node = 1,
+            jobname = "genSmpls",
+            slurm_options = list(mem = 12000,
+                                 array = sprintf("0-%d%%%d",
+                                                 nrow(pars) - 1,
+                                                 1000),
+                                 'cpus-per-task' = 1,
+                                 error =  "%A_%a.err",
+                                 output = "%A_%a.out",
+                                 time = "96:00:00"))
 
 
 
