@@ -1,0 +1,45 @@
+\documentclass{article}
+
+\usepackage{Sweave}
+\begin{document}
+\input{lognormDerivation-concordance}
+
+\title{Derviation of the lognormal distribution}
+\maketitle
+
+When simulating a ``genome'' the probability of an exon being captured is drawn from a lognormal distribution. This document shows how the parameters for the distribution were taken from a real pool of 16 samples, captured after the samples were pooled together.
+
+\begin{Schunk}
+\begin{Sinput}
+> library(data.table)
+> library(cnvR)
+> library(MASS)
+> data(real16) ## Load the real data into the environment
+> ## Calculate the median counts (across samples) per exon
+> meds <- real16[ , list(medN = median(N)), by = ref][medN > 0]
+> ## Fit the median counts (across samples) per exon to lognormal
+> fit <- meds[ , fitdistr(medN/sum(medN), "lognormal")]
+> signif(fit$estimate, 4)
+\end{Sinput}
+\begin{Soutput}
+ meanlog    sdlog 
+-12.3600   0.7393 
+\end{Soutput}
+\begin{Sinput}
+> xvls <- seq(0, 4e-5, length.out = 1000)
+> hist(meds[ , medN/sum(medN)],
++      breaks = 1000,
++      xlim = range(xvls),
++      freq = FALSE,
++      border = "darkgrey",
++      col = "lightgrey",
++      xlab = "Probability of capture",
++      main = "")
+> lines(xvls, dlnorm(xvls, fit$estimate[1], fit$estimate[2]), lwd = 2)
+\end{Sinput}
+\end{Schunk}
+\includegraphics{lognormDerivation-001}
+
+
+
+\end{document}
