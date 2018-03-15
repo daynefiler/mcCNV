@@ -17,15 +17,16 @@ Ne <- 172000 ## Number of exons
 Ns <- 16 ## Number of samples
 
 ## Set up the file system
+if (dir.exists(fdir)) unlink(fdir, recursive = TRUE, force = TRUE)
 dir.create(fdir)
 depDir <- sprintf("d%0.3d/w%0.1d", rep(deps, each = length(cw)), cw)
 sapply(file.path(fdir, depDir), dir.create, recursive = TRUE)
 
-simPars <- expand.grid(Ns = Ns, Ne = Ne, dep = deps, 
-                       cw = cw, rep = seq(reps), fdir = fdir)
-simPars <- as.data.table(simPars)
+pars <- expand.grid(Ns = Ns, Ne = Ne, dep = deps, 
+                    cw = cw, rep = seq(reps), fdir = fdir)
+pars <- as.data.table(pars)
 set.seed(1234)
-simPars[ , seed := sample(1e6, .N)]
+pars[ , seed := sample(1e6, .N)]
 
 savePool <- function(Ns, Ne, dep, cw, rep, seed, fdir) {
   wndw <- c(dep - 3, dep + 3)*1e6
@@ -37,7 +38,7 @@ savePool <- function(Ns, Ne, dep, cw, rep, seed, fdir) {
 }
 
 slurm_apply(f = savePool, 
-            params = simPars, 
+            params = pars, 
             nodes = nrow(pars),
             cpus_per_node = 1,
             jobname = "genSmpls",
