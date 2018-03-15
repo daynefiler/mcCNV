@@ -12,7 +12,7 @@ When simulating a ``genome'' the probability of an exon being captured is drawn 
 library(data.table)
 library(cnvR)
 library(MASS)
-data(real16) ## Load the real data into the environment
+data(real16) 
 ## Calculate the median counts (across samples) per exon
 meds <- real16[ , list(medN = median(N)), by = ref][medN > 0]
 ## Fit the median counts (across samples) per exon to lognormal
