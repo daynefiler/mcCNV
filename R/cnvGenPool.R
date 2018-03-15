@@ -42,7 +42,7 @@
 #' \code{cnvGenSmpl}. This allows the simulated datasets to be completely
 #' reproducible. 
 #' 
-#' @import utils
+#' @importFrom stats rlnorm runif
 #' @import data.table
 #' @export 
 

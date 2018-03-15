@@ -22,7 +22,6 @@
 #' be denoted as 0.5. The values we suggest for the possible states and their
 #' priors are given as the default values. 
 #' 
-#' @import utils
 #' @import data.table
 #' @export 
 

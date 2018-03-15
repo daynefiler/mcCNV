@@ -22,11 +22,11 @@
 #' 
 #' @return IRanges object with reference intervals
 #' 
-#' @import utils
-#' @import Rsamtools 
 #' @import data.table
-#' @import IRanges 
-#' @import GenomicRanges
+#' @importFrom utils strcapture
+#' @importFrom IRanges IRanges findOverlapPairs
+#' @importClassesFrom IRanges IRanges
+#' @importFrom S4Vectors elementMetadata elementMetadata<-
 #' @export 
 
 

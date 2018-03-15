@@ -66,7 +66,7 @@
 #' @return data.table object with specified fields & tags extracted from 
 #' .bam file
 #' 
-#' @import Rsamtools 
+#' @importFrom Rsamtools ScanBamParam scanBam
 #' @export 
 
 cnvReadBam <- function(bamfile, which, what, tags = NULL, keyby = NULL) {
@@ -93,7 +93,9 @@ cnvReadBam <- function(bamfile, which, what, tags = NULL, keyby = NULL) {
 #' 
 #' @return IRanges object with reference intervals
 #' 
-#' @import Rsamtools 
+#' @importFrom Rsamtools scanBamHeader
+#' @importFrom IRanges IRanges
+#' @importClassesFrom IRanges IRanges
 #' @export 
 
 cnvReadRefs <- function(bamfile) {
