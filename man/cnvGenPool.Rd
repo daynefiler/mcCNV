@@ -22,8 +22,6 @@ sample}
 
 \item{seed}{numeric of length 1, the starting seed for the random number
 generator, can be left NULL}
-
-\item{seed.smpl}{logical, should the sample seed be given?}
 }
 \details{
 The number of molecules per sample is drawn from a uniform distribution with

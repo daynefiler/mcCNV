@@ -6,7 +6,9 @@
 #' @title Aggregate CN-state calls from different widths to single call
 #' 
 #' @param dat the input data, see details
-#' @param width the maximum window size used to analyze the data
+#' @param weight logical of length 1, when TRUE likelihood values are multiplied
+#' by the width 
+#' @inheritParams cnvCallCN
 #' 
 #' @details 
 #' Need to add
@@ -15,7 +17,7 @@
 #' @importFrom tidyr separate 
 #' @export
 
-cnvAggCall <- function(dat, width = 5, weight = FALSE) {
+cnvAggCall <- function(dat, width = 5, weight = TRUE) {
   
   cols <- paste0("p", seq(width))
   dat <- separate(dat, 

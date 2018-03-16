@@ -52,22 +52,33 @@ doCalc <- function(prior, dep, cw, rep, wdir) {
                                        "width", "CN", "lk"), 
                          width = 5, 
                          verbose = TRUE))
-  !is(smpls, 'try-error')
+  if (!is(smpls, 'try-error')) {
+    smpls[ , ACT := actCNSngl != 1]
+    smpls[is.na(C2), C2 := FALSE]
+    res <- smpls[ , .N, by = list(ACT, C1, C2)][order(-ACT, -C1, -C2)]
+    res[ , prior := prior]
+    res[ , dep := dep]
+    res[ , width := cw]
+    res[ , rep := rep]
+    return(res[])
+  } else {
+    return(FALSE)
+  }
 }
 
-res <- slurm_apply(f = doCalc, 
-                   params = pars, 
-                   nodes = nrow(pars),
-                   cpus_per_node = 1,
-                   jobname = "priorAnalysis", 
-                   slurm_options = list(mem = 20000,
-                                        array = sprintf("0-%d%%%d", 
-                                                        nrow(pars) - 1, 
-                                                        1000),
-                                        'cpus-per-task' = 1,
-                                        error =  "%A_%a.err",
-                                        output = "%A_%a.out",
-                                        time = "96:00:00"))
+slurm_apply(f = doCalc, 
+            params = pars, 
+            nodes = nrow(pars),
+            cpus_per_node = 1,
+            jobname = "priorAnalysis", 
+            slurm_options = list(mem = 20000,
+                                 array = sprintf("0-%d%%%d", 
+                                                 nrow(pars) - 1, 
+                                                 1000),
+                                 'cpus-per-task' = 1,
+                                 error =  "%A_%a.err",
+                                 output = "%A_%a.out",
+                                 time = "96:00:00"))
 
 
 

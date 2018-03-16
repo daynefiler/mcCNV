@@ -4,12 +4,16 @@
 \alias{cnvAggCall}
 \title{Aggregate CN-state calls from different widths to single call}
 \usage{
-cnvAggCall(dat, width = 5, weight = FALSE)
+cnvAggCall(dat, width = 5, weight = TRUE)
 }
 \arguments{
 \item{dat}{the input data, see details}
 
-\item{width}{the maximum window size used to analyze the data}
+\item{width}{integer of length 1, the maximum width (number of consecutive
+exons) to evaluate simultaneously}
+
+\item{weight}{logical of length 1, when TRUE likelihood values are multiplied
+by the width}
 }
 \details{
 Need to add

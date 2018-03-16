@@ -139,9 +139,12 @@
     setkey(cnts, sbj, ref)
     cnts[ , oldCN := CN]
     calcProb <- function(x) cnts[ , pnbinom(N, sf/phi, 1/(mn*phi*x + 1))]
+    calcExpt <- function(x) cnts[ , N > sf*mn*x]
     probMat <- do.call(cbind, lapply(cs, calcProb))
-    ind <- which(probMat > 0.5, arr.ind = TRUE)
-    probMat[ind] <- 1 - probMat[ind]
+    exptMat <- do.call(cbind, lapply(cs, calcExpt))
+    exptMat[is.na(exptMat)] <- FALSE
+    probMat[exptMat] <- 1 - probMat[exptMat]
+    rm(exptMat); gc()
     probMat <- sweep(probMat, 2, cp, "*")
     cnts[ , CN := cs[rowMaxs(probMat)]]
     cnts[ , lk := rowMaxs(probMat, value = TRUE)]
