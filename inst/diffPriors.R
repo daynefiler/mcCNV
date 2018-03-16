@@ -29,7 +29,7 @@ depDir <- with(expand.grid(priors, deps, cws),
 depDir <- sub("0.", "", depDir)
 sapply(file.path(odir, depDir), dir.create, recursive = TRUE)
 
-pars <- expand.grid(prior = priors, dep = deps, cw = cws, rep = seq(1000))
+pars <- expand.grid(prior = priors, dep = deps, cw = cws, rep = seq(200))
 pars <- as.data.table(pars)
 set.seed(1234)
 pars <- pars[pars[ , .I[sample(.N, 20)], by = list(prior, dep, cw)]$V1]
@@ -50,7 +50,8 @@ doCalc <- function(prior, dep, cw, rep, wdir) {
                          shrink = TRUE,
                          keep.cols = c("ref", "sbj", "N", "actCN", 
                                        "width", "CN", "lk"), 
-                         width = 5, 
+                         width = 5,
+                         weight = TRUE,
                          verbose = TRUE))
   if (!is(smpls, 'try-error')) {
     smpls[ , ACT := actCNSngl != 1]
