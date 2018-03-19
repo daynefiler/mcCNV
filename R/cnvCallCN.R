@@ -38,10 +38,15 @@ cnvCallCN <- function(cnts, prior, width = 5, min.dlt = 20, max.its = 30,
   
   ## Need to add more data checks. 
   
-  widths <- seq(width)
-  if (verbose) cat("Collapsing exons...")
-  cnts <- rbindlist(lapply(widths, .clpsExon, dat = cnts))
-  if (verbose) cat("done.\n")
+  if (width > 1) {
+    widths <- seq(width)
+    if (verbose) cat("Collapsing exons...")
+    cnts <- rbindlist(lapply(widths, .clpsExon, dat = cnts))
+    if (verbose) cat("done.\n")
+  } else {
+    cnts[ , width := 1]
+  }
+  
   if (verbose) cat("Calling CNVs...")
   cnts <- .callCN(cnts = cnts, 
                   min.dlt = min.dlt, 
@@ -60,7 +65,7 @@ cnvCallCN <- function(cnts, prior, width = 5, min.dlt = 20, max.its = 30,
     cnts <- cnts[ , .SD, .SDcols = cols]
   }
   
-  if (agg & width > 1) cnts <- cnvAggCall(cnts, weight = weight)
+  if (agg & width > 1) cnts <- cnvAggCall(cnts, width = width, weight = weight)
   
   setattr(cnts, "its", its)
   
