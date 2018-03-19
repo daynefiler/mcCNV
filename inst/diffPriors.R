@@ -82,132 +82,69 @@ slurm_apply(f = doCalc,
                                  time = "96:00:00"))
 
 
-
-
 ##----------------------------------------------------------------------------##
-## Script to rerun failed jobs
+## Script to analyze the results
 ##----------------------------------------------------------------------------##
 
-# library(cnvR)
-# library(rslurm)
-# library(data.table)
-# 
-# ## Create vector or priors
-# priors <- numeric(25)
-# priors[1] <- 0.5
-# for (i in seq_along(priors)) {
-#   priors[i + 1] <- priors[i]/1.3
-# }
-# priors <- round(priors, 4)
-# 
-# ## Directory with simulated data
-# wdir <- file.path("/", "projects", "sequence_analysis", "vol5", 
-#                   "dfiler", "cnvR")
-# idir <- file.path(wdir, "simData")
-# deps <- seq(5, 100, 5) ## Sequencing depths 
-# cws <- 1:5 ## Sizes of cnvs (number of exons spanned) 
-# odir <- file.path(wdir, "priorAnalysis")
-# 
-# pars <- expand.grid(prior = priors, dep = deps, cw = cws, rep = seq(1000))
-# pars <- as.data.table(pars)
-# set.seed(1234)
-# pars <- pars[pars[ , .I[sample(.N, 50)], by = list(prior, dep, cw)]$V1]
-# pars[ , wdir := wdir]
-# 
-# fls <- list.files(odir, recursive = TRUE)
-# fls <- basename(fls)
-# pars[ , pf := sub("0.", "", sprintf("p%0.4f", prior))]
-# pars[ , of := sprintf("sRes_%s_d%0.3d_w%0.1d_r%0.4d.RDS", pf, dep, cw, rep)]
-# pars[ , rerun := !of %in% fls]
-# pars <- pars[(rerun)]
-# pars <- pars[ , list(prior, dep, cw, rep, wdir)]
-# 
-# doCalc <- function(prior, dep, cw, rep, wdir) {
-#   ifile <- sprintf("sim_d%0.3d_w%0.1d_r%0.4d.RDS", dep, cw, rep)
-#   idir <- file.path(sprintf("d%0.3d", dep), sprintf("w%0.1d", cw))
-#   dat <- readRDS(file.path(wdir, "simData", idir, ifile))
-#   priorFmt <- sub("0.", "", sprintf("p%0.4f", prior))
-#   ofile <- sprintf("sRes_%s_d%0.3d_w%0.1d_r%0.4d.RDS", priorFmt, dep, cw, rep)
-#   odir <- file.path(priorFmt, idir)
-#   out <- file.path(wdir, "priorAnalysis", odir, ofile)
-#   smpls <- try(cnvCallCN(cnts = dat, prior = prior, outfile = out))
-#   !is(smpls, 'try-error')
-# }
-# 
-# res <- slurm_apply(f = doCalc, 
-#                    params = pars, 
-#                    nodes = nrow(pars),
-#                    cpus_per_node = 1,
-#                    jobname = "priorRerun2", 
-#                    slurm_options = list(mem = 32000,
-#                                         array = sprintf("0-%d%%%d", 
-#                                                         nrow(pars) - 1, 
-#                                                         400),
-#                                         'cpus-per-task' = 1,
-#                                         error =  "%A_%a.err",
-#                                         output = "%A_%a.out",
-#                                         time = "96:00:00"))
-# 
-# 
-# ##----------------------------------------------------------------------------##
-# ## Script to analyze the results
-# ##----------------------------------------------------------------------------##
-# 
-# library(cnvR)
-# library(rslurm)
-# library(data.table)
-# library(stringr)
-# 
-# wdir <- file.path("/", "projects", "sequence_analysis", "vol5", 
-#                   "dfiler", "cnvR")
-# odir <- file.path(wdir, "priorAnalysis")
-# pars <- list.files(odir, recursive = TRUE, full.names = TRUE)
-# pars <- data.table(objFile = pars)
-# 
-# priorAnalysis <- function(objFile) {
-#   
-#   prior <- as.numeric(sub("p", "", str_extract(objFile, "p[0-9]+")))/10000
-#   width <- as.numeric(sub("w", "", str_extract(objFile, "w[0-9]+")))
-#   depth <- as.numeric(sub("d", "", str_extract(objFile, "d[0-9]+")))
-#   
-#   dat <- readRDS(objFile)
-#   dat <- cnvAggCall(dat)
-#   out <- data.table(objFile = objFile,
-#                     prior = prior,
-#                     width = width,
-#                     depth = depth,
-#                     tn = dat[actCNSngl == 1 & CN == 1, .N],
-#                     tp = dat[actCNSngl != 1 & CN != 1, .N],
-#                     fp = dat[actCNSngl == 1 & CN != 1, .N],
-#                     fn = dat[actCNSngl != 1 & CN == 1, .N],
-#                     fc = dat[actCNSngl != CN, .N],
-#                     calls = list(dat[ , .N, by = list(actCNSngl, CN)]))
-#   
-#   out[]
-#   
-# }
-# 
-# jobSetup <- function(pars, name) {
-#   slurm_apply(f = priorAnalysis, 
-#               params = pars, 
-#               nodes = nrow(pars),
-#               cpus_per_node = 1,
-#               jobname = name, 
-#               slurm_options = list(mem = 12228,
-#                                    array = sprintf("0-%d%%%d", 
-#                                                    nrow(pars) - 1, 
-#                                                    800),
-#                                    'cpus-per-task' = 1,
-#                                    error =  "%A_%a.err",
-#                                    output = "%A_%a.out",
-#                                    time = "96:00:00"))
-# }
-# 
-# p1 <- pars[1:60000]
-# p2 <- pars[60001:120000]
-# p3 <- pars[120001:nrow(pars)]
-# 
-# jobSetup(p1, "priorAnalysis1")
-# jobSetup(p2, "priorAnalysis2")
-# jobSetup(p3, "priorAnalysis3")
+library(cnvR)
+library(rslurm)
+library(data.table)
+library(lattice)
+library(latticeExtra)
+
+sjob <- slurm_job("priorAnalysis", 52000)
+
+res <- get_slurm_out(sjob)
+saveRDS(res, "~/Desktop/priorRes.RDS")
+res <- rbindlist(res)
+
+res[ , fdep := as.factor(dep)]
+res[ , fwid := as.factor(width)]
+
+resSmry <- res[ , 
+               list(tp1 = sum(N[ ACT &  C1]),
+                    fp1 = sum(N[!ACT &  C1]),
+                    tn1 = sum(N[!ACT & !C1]),
+                    fn1 = sum(N[ ACT & !C1]),
+                    tp2 = sum(N[ ACT &  C2]),
+                    fp2 = sum(N[!ACT &  C2]),
+                    tn2 = sum(N[!ACT & !C2]),
+                    fn2 = sum(N[ ACT & !C2])),
+               by = list(prior, fdep, fwid, rep)]
+
+resSmry[ , fpr1 := fp1/(fp1 + tn1)]
+resSmry[ , tpr1 := tp1/(tp1 + fn1)]
+resSmry[ , spc1 := tn1/(fp1 + tn1)]
+resSmry[ , pf1  := fp1/(fp1 + tp1)]
+resSmry[ , fpr2 := fp2/(fp2 + tn2)]
+resSmry[ , tpr2 := tp2/(tp2 + fn2)]
+resSmry[ , spc2 := tn2/(fp2 + tn2)]
+resSmry[ , pf2  := fp2/(fp2 + tp2)]
+
+resMn <- resSmry[ , lapply(.SD, mean), by = list(prior, fdep, fwid)]
+resSD <- resSmry[ , lapply(.SD, sd),   by = list(prior, fdep, fwid)]
+
+plt <- xyplot(tpr1 ~ pf1 | fdep + fwid, data = resMn, xlim = c(0, 1),
+              xlab = "FP/(TP + FP)",
+              ylab = "TPR",
+              panel = function(x, y, ...) {
+                trellis.par.set(pty = "s")
+                panel.xyplot(x, y, type = "l", lwd = 2)
+                # panel.abline(h = 1, lty = "dashed")
+                panel.abline(v = 0.05, lty = "dashed")
+                panel.abline(a = 0, b = 1, lty = "dashed")
+                panel.abline(h = 0.95, lty = "dashed")
+              })
+
+plt <- plt + as.layer(xyplot(tpr2 ~ pf2 | fdep + fwid, data = resMn, type = "l", col = "red", lwd = 2))
+
+pdf("~/Github/cnvR/inst/junk/priorRes.pdf", width = 11, height = 8.5)
+plt
+graphics.off()
+
+
+
+
+
+
 
