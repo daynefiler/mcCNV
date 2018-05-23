@@ -132,6 +132,7 @@
                     by = list(ref, width)]
     shrPhi[is.na(vr), vr := mn]
     shrPhi[ , phi := (n*vr + mn*isf)/(mn^2*isf), by = ref]
+    shrPhi[(phi < 0), phi := 0]
     if (shrink) shrPhi[ , phi := .calcShrPhi(phi), by = width]
     setkey(cnts, ref)
     setkey(shrPhi, ref)
