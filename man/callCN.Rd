@@ -19,6 +19,9 @@ state to stop the alogorithm}
 
 \item{shrink}{logical of length 1, shrinkage applied to phi when TRUE}
 }
+\description{
+Call copy number-state
+}
 \details{
 Need to add
 }

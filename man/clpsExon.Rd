@@ -12,6 +12,9 @@
 
 \item{cw}{integer of length 1, the width to collapse by}
 }
+\description{
+Collapse exons by specified width
+}
 \details{
 Need to add
 }

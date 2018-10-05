@@ -23,6 +23,9 @@ sample}
 \item{seed}{numeric of length 1, the starting seed for the random number
 generator, can be left NULL}
 }
+\description{
+Generate a simulated pool of samples
+}
 \details{
 The number of molecules per sample is drawn from a uniform distribution with
 the bounds given by `wndw`.

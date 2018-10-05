@@ -10,16 +10,19 @@ cnvGetCounts(bamfile, intfile, refname, outfile = NULL, results = TRUE,
 \arguments{
 \item{bamfile}{Character of length 1, the file path to the .bam file}
 
-\item{intfile}{Character of length 1, the file path ot the interval file}
-
 \item{refname}{Character of length 1, the name of the reference sequence
-to evaluate}
+(chr) to evaluate, when NULL evaluate the whole bam file}
 
 \item{outfile}{Character of length 1, the file path to write results (.csv),
 no results written if NULL}
 
 \item{verbose}{TRUE/FALSE, if TRUE progress messages will be sent to the 
 console}
+
+\item{bedfile}{Character of length 1, the file path ot the interval file}
+
+\item{pad}{Integer of length 1, the number of basepairs to pad around the 
+bed file intervals}
 
 \item{return}{TRUE/FALSE, should the results be returned to the console?
 Should not be FALSE if outfile is NULL}

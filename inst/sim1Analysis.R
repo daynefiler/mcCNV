@@ -1,18 +1,10 @@
 ##----------------------------------------------------------------------------##
-## Script to do the prior selection analysis
+## Script to do the analysis on the whole simulation at prior of 0.03
 ##----------------------------------------------------------------------------##
 
 library(cnvR)
 library(rslurm)
 library(data.table)
-
-## Create vector or priors
-priors <- numeric(25)
-priors[1] <- 0.5
-for (i in seq_along(priors)) {
-  priors[i + 1] <- priors[i]/1.3
-}
-priors <- round(priors, 4)
 
 ## Directory with simulated data
 wdir <- file.path("/", "projects", "sequence_analysis", "vol5", 
@@ -22,18 +14,16 @@ deps <- seq(5, 100, 5) ## Sequencing depths
 cws <- 1:5 ## Sizes of cnvs (number of exons spanned) 
 
 ## Set up the file system
-odir <- file.path(wdir, "priorAnalysis")
+odir <- file.path(wdir, "sim1Analysis")
 dir.create(odir)
-depDir <- with(expand.grid(priors, deps, cws),
-               sprintf("p%0.04f/d%0.3d/w%0.1d", Var1, Var2, Var3))
-depDir <- sub("0.", "", depDir)
+depDir <- with(expand.grid(deps, cws),
+               sprintf("d%0.3d/w%0.1d", Var1, Var2))
 sapply(file.path(odir, depDir), dir.create, recursive = TRUE)
 
-pars <- expand.grid(prior = priors, dep = deps, cw = cws, rep = seq(200))
+pars <- expand.grid(dep = deps, cw = cws, rep = seq(200))
 pars <- as.data.table(pars)
-set.seed(1234)
-pars <- pars[pars[ , .I[sample(.N, 20)], by = list(prior, dep, cw)]$V1]
 pars[ , wdir := wdir]
+pars[ , prior := 0.03]
 
 doCalc <- function(prior, dep, cw, rep, wdir) {
   ifile <- sprintf("sim_d%0.3d_w%0.1d_r%0.4d.RDS", dep, cw, rep)
@@ -41,8 +31,7 @@ doCalc <- function(prior, dep, cw, rep, wdir) {
   dat <- readRDS(file.path(wdir, "sim1Data", idir, ifile))
   priorFmt <- sub("0.", "", sprintf("p%0.4f", prior))
   ofile <- sprintf("sRes_%s_d%0.3d_w%0.1d_r%0.4d.RDS", priorFmt, dep, cw, rep)
-  odir <- file.path(priorFmt, idir)
-  out <- file.path(wdir, "priorAnalysis", odir, ofile)
+  out <- file.path(wdir, "sim1Analysis", idir, ofile)
   kp <- c("ref", "sbj", "N", "actCN", "mn", "phi", "width", "CN", "lk", "lk1")
   smpls <- try(cnvCallCN(cnts = dat, 
                          prior = prior, 
@@ -51,6 +40,7 @@ doCalc <- function(prior, dep, cw, rep, wdir) {
                          shrink = TRUE,
                          keep.cols = kp, 
                          width = 5,
+                         weight = TRUE,
                          verbose = TRUE))
   if (!is(smpls, 'try-error')) {
     smpls[ , ACT := actCNSngl != 1]
@@ -73,8 +63,8 @@ slurm_apply(f = doCalc,
             params = pars, 
             nodes = nrow(pars),
             cpus_per_node = 1,
-            jobname = "priorAnalysis", 
-            slurm_options = list(mem = 20000,
+            jobname = "sim1Analysis", 
+            slurm_options = list(mem = 16000,
                                  array = sprintf("0-%d%%%d", 
                                                  nrow(pars) - 1, 
                                                  1000),
@@ -85,7 +75,7 @@ slurm_apply(f = doCalc,
 
 
 ##----------------------------------------------------------------------------##
-## Script to analyze the results
+## After the job finishes...
 ##----------------------------------------------------------------------------##
 
 library(cnvR)
@@ -93,65 +83,86 @@ library(rslurm)
 library(data.table)
 library(lattice)
 library(latticeExtra)
+library(RColorBrewer)
 
-sjob <- slurm_job("priorAnalysis", 52000)
+col2alpha <- function(col, alpha = 0.5) {
+  tmp <- col2rgb(col)
+  rgb(tmp[1]/255, tmp[2]/255, tmp[3]/255, alpha)  
+}
 
-res <- get_slurm_out(sjob)
-saveRDS(res, "~/Desktop/priorRes.RDS")
-res <- rbindlist(res)
+calcMCC <- function(tp, tn, fp, fn) {
+  tp <- as.numeric(tp)
+  tn <- as.numeric(tn)
+  fp <- as.numeric(fp)
+  fn <- as.numeric(fn)
+  (tp*tn - fp*fn)/(sqrt((tp + fp)*(tp + fn)*(tn + fp)*(tn + fn)))
+}
+
+# sjob <- slurm_job("sim1Analysis", 20000)
+# res <- get_slurm_out(sjob)
+# res <- rbindlist(res)
+# saveRDS(res, "sim1Analysis.RDS")
+res <- readRDS("sim1Analysis.RDS")
 
 res[ , fdep := as.factor(dep)]
 res[ , fwid := as.factor(width)]
 
 resSmry <- res[ , 
-               list(tp1 = sum(N[ ACT &  C1]),
-                    fp1 = sum(N[!ACT &  C1]),
-                    tn1 = sum(N[!ACT & !C1]),
-                    fn1 = sum(N[ ACT & !C1]),
-                    tp2 = sum(N[ ACT &  C2]),
-                    fp2 = sum(N[!ACT &  C2]),
-                    tn2 = sum(N[!ACT & !C2]),
-                    fn2 = sum(N[ ACT & !C2])),
-               by = list(prior, fdep, fwid, rep)]
+                list(tp = sum(N[ ACT &  C1]),
+                     fp = sum(N[!ACT &  C1 & !PRO]),
+                     tn = sum(N[!ACT & !C1]),
+                     fn = sum(N[ ACT & !C1])),
+                by = list(prior, fdep, fwid, rep)]
 
-resSmry[ , fpr1 := fp1/(fp1 + tn1)]
-resSmry[ , tpr1 := tp1/(tp1 + fn1)]
-resSmry[ , spc1 := tn1/(fp1 + tn1)]
-resSmry[ , pf1  := fp1/(fp1 + tp1)]
-resSmry[ , fpr2 := fp2/(fp2 + tn2)]
-resSmry[ , tpr2 := tp2/(tp2 + fn2)]
-resSmry[ , spc2 := tn2/(fp2 + tn2)]
-resSmry[ , pf2  := fp2/(fp2 + tp2)]
+resSmry[ , fpr := fp/(fp + tn)]
+resSmry[ , tpr := tp/(tp + fn)]
+resSmry[ , spc := tn/(fp + tn)]
+resSmry[ , pf  := fp/(fp + tp)]
+resSmry[ , mcc := calcMCC(tp, tn, fp, fn)]
 
 resMn <- resSmry[ , lapply(.SD, mean), by = list(prior, fdep, fwid)]
 resSD <- resSmry[ , lapply(.SD, sd),   by = list(prior, fdep, fwid)]
 
-plt <- xyplot(tpr1 ~ pf1 | fdep + fwid, data = resMn, xlim = c(0, 1),
-              xlab = "FP/(TP + FP)",
-              ylab = "TPR",
-              panel = function(x, y, ...) {
-                trellis.par.set(pty = "s")
-                panel.xyplot(x, y, type = "l", lwd = 2)
-                # panel.abline(h = 1, lty = "dashed")
-                panel.abline(v = 0.05, lty = "dashed")
-                panel.abline(a = 0, b = 1, lty = "dashed")
-                panel.abline(h = 0.95, lty = "dashed")
-              })
+pltStat <- function(mndat, sddat, stat, ylab, h) {
+  plot.new()
+  plot.window(ylim = c(0, 1), xlim = c(5, 100))
+  abline(h = h, lty = "dashed", col = "darkgrey")
+  abline(v = seq(5, 100, 5), lty = "dotted", col = "lightgrey")
+  for (i in 1:5) {
+    fdep <- mndat[order(fdep)][fwid == i, as.numeric(as.character(fdep))]
+    sval <- mndat[order(fdep)][fwid == i, get(stat)]
+    SD   <- sddat[order(fdep)][fwid == i, get(stat)]
+    cols <- brewer.pal(9, "Blues")[i + 3]
+    lines(fdep, sval, col = cols)
+    polygon(x = c(fdep, rev(fdep)), 
+            y = c(sval + SD, rev(sval - SD)), 
+            col = col2alpha(cols, alpha = 0.25), 
+            border = NA)
+  }
+  axis(side = 1, at = seq(10, 100, by = 10))
+  axis(side = 2)
+  mtext("Depth", side = 1, line = 3)
+  mtext(ylab, side = 2, line = 3)
+}
 
-plt <- plt + as.layer(xyplot(tpr2 ~ pf2 | fdep + fwid, data = resMn, type = "l", col = "red", lwd = 2))
+pltStat(resMn, resSD, "tpr", "TPR", 0.95)
+pltStat(resMn, resSD, "pf", "FP/(TP + FP)", 0.05)
+pltStat(resMn, resSD, "mcc", "MCC", 0.95)
 
-pdf("~/Github/cnvR/inst/junk/priorRes.pdf", width = 11, height = 8.5)
-plt
 graphics.off()
 
 
-## Playing.. should not be included in final script
 
-dat <- readRDS("priorAnalysis/p0279/d050/w1/sRes_p0279_d050_w1_r0005.RDS")
-dat[ , null := sapply(width, function(x) paste(rep(1, x), collapse = ":"))]
-dat[ , PRO := actCN != null]
-dat[ , ACT := actCNSngl != 1]
-dat[ , .N, by = list(ACT, C1, PRO)][order(-ACT, -C1, -PRO)]
+
+
+
+
+
+
+
+
+
+
 
 
 

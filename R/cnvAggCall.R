@@ -6,18 +6,22 @@
 #' @title Aggregate CN-state calls from different widths to single call
 #' 
 #' @param dat the input data, see details
-#' @param weight logical of length 1, when TRUE likelihood values are multiplied
-#' by the width 
 #' @inheritParams cnvCallCN
 #' 
 #' @details 
 #' Need to add
 #' 
+#' C1 -- TRUE if any interval of the given width that overlaps the exon was
+#' called a CNV
+#' C2 -- TRUE only over the interval that had the greatest likelihood (this 
+#' is a subset of C1, eg look where there were positive calls, then subset
+#' down to the most likely interval within the C1 calls)
+#' 
 #' @import data.table
 #' @importFrom tidyr separate 
 #' @export
 
-cnvAggCall <- function(dat, width = 5, weight = TRUE) {
+cnvAggCall <- function(dat, width = 5) {
   
   cols <- paste0("p", seq(width))
   dat <- separate(dat, 
@@ -45,8 +49,11 @@ cnvAggCall <- function(dat, width = 5, weight = TRUE) {
          by = list(sbj, sngl)]
   }
   dat <- dat[!(C1 & CN == 1)]
-  if (weight)  dat[ , wtlk := lk*width]
-  lkcol <- ifelse(weight, "wtlk", "lk")
+  ## Initial versions had a weight parameter; when TRUE multiply the likelihood
+  ## values by the width. 
+  # if (weight)  dat[ , wtlk := lk*width]
+  # lkcol <- ifelse(weight, "wtlk", "lk")
+  lkcol <- "lk"
   setorderv(dat, c("sbj", "sngl", lkcol), c(1, 1, -1))
   ind <- dat[ , list(ind = .I[1]), by = list(sbj, sngl)]$ind
   dat <- dat[ind]

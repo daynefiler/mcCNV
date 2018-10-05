@@ -10,9 +10,11 @@
 #' that span a given reference sequence. 
 #' 
 #' @param bamfile Character of length 1, the file path to the .bam file
-#' @param intfile Character of length 1, the file path ot the interval file
+#' @param bedfile Character of length 1, the file path ot the interval file
+#' @param pad Integer of length 1, the number of basepairs to pad around the 
+#' bed file intervals
 #' @param refname Character of length 1, the name of the reference sequence
-#' to evaluate
+#' (chr) to evaluate, when NULL evaluate the whole bam file 
 #' @param outfile Character of length 1, the file path to write results (.csv),
 #' no results written if NULL
 #' @param return TRUE/FALSE, should the results be returned to the console?

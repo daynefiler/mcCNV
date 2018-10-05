@@ -4,17 +4,23 @@
 \alias{cnvAggCall}
 \title{Aggregate CN-state calls from different widths to single call}
 \usage{
-cnvAggCall(dat, width = 5, weight = TRUE)
+cnvAggCall(dat, width = 5)
 }
 \arguments{
 \item{dat}{the input data, see details}
 
 \item{width}{integer of length 1, the maximum width (number of consecutive
 exons) to evaluate simultaneously}
-
-\item{weight}{logical of length 1, when TRUE likelihood values are multiplied
-by the width}
+}
+\description{
+Aggregate CN-state calls from different widths to single call
 }
 \details{
 Need to add
+
+C1 -- TRUE if any interval of the given width that overlaps the exon was
+called a CNV
+C2 -- TRUE only over the interval that had the greatest likelihood (this 
+is a subset of C1, eg look where there were positive calls, then subset
+down to the most likely interval within the C1 calls)
 }

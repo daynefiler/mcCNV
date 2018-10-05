@@ -1,5 +1,5 @@
 ##----------------------------------------------------------------------------##
-## Script to create the simulated dataset
+## Script to create the simulated dataset uniform CNV sizes
 ##----------------------------------------------------------------------------##
 
 library(cnvR)
@@ -9,7 +9,7 @@ library(data.table)
 ## Setup simulation
 ## Directory for storing the data
 fdir <- file.path("/", "projects", "sequence_analysis", "vol5", 
-                  "dfiler", "cnvR", "simData")
+                  "dfiler", "cnvR", "sim1Data")
 deps <- seq(5, 100, 5) ## Sequencing depths 
 cw <- 1:5 ## Sizes of cnvs (number of exons spanned) 
 reps <- 200 ## Number of repetitions 

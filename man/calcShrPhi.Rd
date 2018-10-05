@@ -10,6 +10,9 @@
 \arguments{
 \item{phi}{numeric, the phi values to shrink}
 }
+\description{
+Shrink phi values
+}
 \details{
 Need to add.
 }

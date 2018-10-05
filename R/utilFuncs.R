@@ -74,7 +74,7 @@
   dat <- dat[ , 
               shift(.SD, 1:cw - 1, type = "lead", give.names = TRUE), 
               by = sbj]
-  dat[ , N := rowSums(.SD), .SDcols = grep("N", colnames(dat))]
+  dat[ , N := rowSums(.SD), .SDcols = grep("^N_lead", colnames(dat))]
   dat[ , 
        ref := do.call(paste, c(.SD, sep = ":")), 
        .SDcols = grep("ref", colnames(dat))]
@@ -107,15 +107,16 @@
 #' @details 
 #' Need to add
 #' 
-#' @importFrom Rfast rowMaxs
+#' @importFrom Rfast rowMaxs rowsums
 #' @import data.table
 
 .callCN <- function(cnts, min.dlt, max.its, prior, shrink = TRUE) {
   
   cnts[ , CN := 1]
   
-  cs <- c(0.001, 0.5, 1, 1.5, 2.0, 2.5, 3.0, 3.5, 4)
-  cp <- rep(prior, length(cs)); cp[which(cs == 1)] <- 1 - prior
+  cs <- c(0.001, 0.5, 1, 1.5, 2.0, 2.5)
+  nstates <- length(cs)
+  cp <- rep(prior, nstates); cp[which(cs == 1)] <- 1 - prior*nstates
   
   it <- 1
   repeat {
@@ -139,16 +140,14 @@
     cnts <- shrPhi[ , list(ref, phi)][cnts]
     setkey(cnts, sbj, ref)
     cnts[ , oldCN := CN]
-    calcProb <- function(x) cnts[ , pnbinom(N, sf/phi, 1/(mn*phi*x + 1))]
-    calcExpt <- function(x) cnts[ , N > sf*mn*x]
+    calcProb <- function(x) cnts[ , dnbinom(N, sf/phi, 1/(mn*phi*x + 1))]
     probMat <- do.call(cbind, lapply(cs, calcProb))
-    exptMat <- do.call(cbind, lapply(cs, calcExpt))
-    exptMat[is.na(exptMat)] <- FALSE
-    probMat[exptMat] <- 1 - probMat[exptMat]
-    rm(exptMat); gc()
     probMat <- sweep(probMat, 2, cp, "*")
+    psum <- rowsums(probMat)
     cnts[ , CN := cs[rowMaxs(probMat)]]
     cnts[ , lk := rowMaxs(probMat, value = TRUE)]
+    cnts[ , post  := lk/psum]
+    cnts[ , post1 := probMat[ , cs == 1]/psum]
     rm(probMat); gc()
     nchng <- cnts[oldCN != CN, .N]
     

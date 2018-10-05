@@ -22,6 +22,9 @@
 list, first element gives the most likely copy number-state and 
 the second element gives the likelihood value
 }
+\description{
+Calculate the maximum likelihood copy number-state for a subject
+}
 \details{
 Need to add
 }
