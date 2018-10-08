@@ -6,7 +6,7 @@
 \usage{
 cnvCallCN(cnts, prior, width = 5, min.dlt = 20, max.its = 30,
   outfile = NULL, agg = FALSE, shrink = TRUE, keep.cols = NULL,
-  verbose = FALSE, weight = TRUE, return.res = TRUE)
+  verbose = FALSE, return.res = TRUE)
 }
 \arguments{
 \item{cnts}{the input data, see details}
@@ -25,8 +25,6 @@ state to stop the alogorithm}
 file given}
 
 \item{shrink}{logical of length 1, shrinkage applied to phi when TRUE}
-
-\item{weight, }{passed to cnvAggCall when agg = TRUEcluster}
 }
 \description{
 Call copy number-state for the given data

@@ -16,18 +16,18 @@ priors <- round(priors, 4)
 
 ## Directory with simulated data
 wdir <- file.path("/", "projects", "sequence_analysis", "vol5", 
-                  "dfiler", "cnvR")
+                  "dfiler", "CNV")
 idir <- file.path(wdir, "sim1Data")
 deps <- seq(5, 100, 5) ## Sequencing depths 
 cws <- 1:5 ## Sizes of cnvs (number of exons spanned) 
 
 ## Set up the file system
 odir <- file.path(wdir, "priorAnalysis")
-dir.create(odir)
 depDir <- with(expand.grid(priors, deps, cws),
                sprintf("p%0.04f/d%0.3d/w%0.1d", Var1, Var2, Var3))
 depDir <- sub("0.", "", depDir)
-sapply(file.path(odir, depDir), dir.create, recursive = TRUE)
+mkdirs <- sapply(file.path(odir, depDir), dir.create, recursive = TRUE)
+all(mkdirs)
 
 pars <- expand.grid(prior = priors, dep = deps, cw = cws, rep = seq(200))
 pars <- as.data.table(pars)

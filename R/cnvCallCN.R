@@ -10,7 +10,6 @@
 #' exons) to evaluate simultaneously
 #' @param outfile character of length 1, when not NULL, save .RDS file to the
 #' file given
-#' @param weight, passed to cnvAggCall when agg = TRUEcluster
 #' @inheritParams callCN
 #' 
 #' @details 
@@ -24,7 +23,7 @@
 # cnts <- readRDS("simData/d050/w1/sim_d050_w1_r0001.RDS"); prior <- 0.0034; width <- 5; min.dlt <- 20; max.its <- 30; shrink = TRUE
 cnvCallCN <- function(cnts, prior, width = 5, min.dlt = 20, max.its = 30, 
                       outfile = NULL, agg = FALSE, shrink = TRUE,
-                      keep.cols = NULL, verbose = FALSE, weight = TRUE,
+                      keep.cols = NULL, verbose = FALSE,
                       return.res = TRUE) {
   
   if (is.data.frame(cnts)) {
@@ -65,7 +64,7 @@ cnvCallCN <- function(cnts, prior, width = 5, min.dlt = 20, max.its = 30,
     cnts <- cnts[ , .SD, .SDcols = cols]
   }
   
-  if (agg & width > 1) cnts <- cnvAggCall(cnts, width = width, weight = weight)
+  if (agg & width > 1) cnts <- cnvAggCall(cnts, width = width)
   
   setattr(cnts, "its", its)
   
