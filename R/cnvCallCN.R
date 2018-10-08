@@ -64,11 +64,19 @@ cnvCallCN <- function(cnts, prior, width = 5, min.dlt = 20, max.its = 30,
     cnts <- cnts[ , .SD, .SDcols = cols]
   }
   
-  if (agg & width > 1) cnts <- cnvAggCall(cnts, width = width)
+  if (agg & width > 1) {
+    if (verbose) cat("Aggregating calls...")
+    cnts <- cnvAggCall(cnts, width = width)
+    if (verbose) cat("done.\n")
+  }
   
   setattr(cnts, "its", its)
   
-  if (!is.null(outfile)) saveRDS(cnts, file = outfile)
+  if (!is.null(outfile)) {
+    if (verbose) cat("Writing output to file...")
+    saveRDS(cnts, file = outfile)
+    if (verbose) cat("done.\n")
+  }
   
   if (return.res) return(cnts[])
   
