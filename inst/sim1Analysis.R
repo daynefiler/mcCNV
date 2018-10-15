@@ -8,22 +8,22 @@ library(data.table)
 
 ## Directory with simulated data
 wdir <- file.path("/", "projects", "sequence_analysis", "vol5", 
-                  "dfiler", "cnvR")
+                  "dfiler", "CNV")
 idir <- file.path(wdir, "sim1Data")
 deps <- seq(5, 100, 5) ## Sequencing depths 
 cws <- 1:5 ## Sizes of cnvs (number of exons spanned) 
 
 ## Set up the file system
 odir <- file.path(wdir, "sim1Analysis")
-dir.create(odir)
 depDir <- with(expand.grid(deps, cws),
                sprintf("d%0.3d/w%0.1d", Var1, Var2))
-sapply(file.path(odir, depDir), dir.create, recursive = TRUE)
+mkdirs <- sapply(file.path(odir, depDir), dir.create, recursive = TRUE)
+all(mkdirs)
 
 pars <- expand.grid(dep = deps, cw = cws, rep = seq(200))
 pars <- as.data.table(pars)
 pars[ , wdir := wdir]
-pars[ , prior := 0.03]
+pars[ , prior := 0.05]
 
 doCalc <- function(prior, dep, cw, rep, wdir) {
   ifile <- sprintf("sim_d%0.3d_w%0.1d_r%0.4d.RDS", dep, cw, rep)
@@ -40,7 +40,6 @@ doCalc <- function(prior, dep, cw, rep, wdir) {
                          shrink = TRUE,
                          keep.cols = kp, 
                          width = 5,
-                         weight = TRUE,
                          verbose = TRUE))
   if (!is(smpls, 'try-error')) {
     smpls[ , ACT := actCNSngl != 1]
@@ -67,7 +66,7 @@ slurm_apply(f = doCalc,
             slurm_options = list(mem = 16000,
                                  array = sprintf("0-%d%%%d", 
                                                  nrow(pars) - 1, 
-                                                 1000),
+                                                 500),
                                  'cpus-per-task' = 1,
                                  error =  "%A_%a.err",
                                  output = "%A_%a.out",

@@ -8,20 +8,21 @@ library(data.table)
 
 ## Directory with simulated data
 wdir <- file.path("/", "projects", "sequence_analysis", "vol5", 
-                  "dfiler", "cnvR")
+                  "dfiler", "CNV")
 idir <- file.path(wdir, "sim2Data")
 deps <- seq(5, 100, 5) ## Sequencing depths 
 
+
 ## Set up the file system
 odir <- file.path(wdir, "sim2Analysis")
-dir.create(odir)
 depDir <- sprintf("d%0.3d", deps)
-sapply(file.path(odir, depDir), dir.create, recursive = TRUE)
+mkdirs <- sapply(file.path(odir, depDir), dir.create, recursive = TRUE)
+all(mkdirs)
 
 pars <- expand.grid(dep = deps, rep = seq(1000))
 pars <- as.data.table(pars)
 pars[ , wdir := wdir]
-pars[ , prior := 0.03]
+pars[ , prior := 0.05]
 
 doCalc <- function(prior, dep, rep, wdir) {
   ifile <- sprintf("sim_d%0.3d_r%0.4d.RDS", dep, rep)
@@ -30,15 +31,14 @@ doCalc <- function(prior, dep, rep, wdir) {
   priorFmt <- sub("0.", "", sprintf("p%0.4f", prior))
   ofile <- sprintf("sRes_%s_d%0.3d_r%0.4d.RDS", priorFmt, dep, rep)
   out <- file.path(wdir, "sim2Analysis", idir, ofile)
+  kp <- c("ref", "sbj", "N", "actCN", "mn", "phi", "width", "CN", "lk", "lk1")
   smpls <- try(cnvCallCN(cnts = dat, 
                          prior = prior, 
                          outfile = out,
                          agg = TRUE, 
                          shrink = TRUE,
-                         keep.cols = c("ref", "sbj", "N", "actCN", 
-                                       "width", "CN", "lk"), 
+                         keep.cols = kp, 
                          width = 5,
-                         weight = TRUE,
                          verbose = TRUE))
   if (!is(smpls, 'try-error')) {
     smpls[ , ACT := actCNSngl != 1]
@@ -49,7 +49,6 @@ doCalc <- function(prior, dep, rep, wdir) {
     setorder(res, -ACT, -C1, -C2, -PRO)
     res[ , prior := prior]
     res[ , dep := dep]
-    res[ , width := cw]
     res[ , rep := rep]
     return(res[])
   } else {
@@ -65,7 +64,7 @@ slurm_apply(f = doCalc,
             slurm_options = list(mem = 16000,
                                  array = sprintf("0-%d%%%d", 
                                                  nrow(pars) - 1, 
-                                                 1000),
+                                                 500),
                                  'cpus-per-task' = 1,
                                  error =  "%A_%a.err",
                                  output = "%A_%a.out",

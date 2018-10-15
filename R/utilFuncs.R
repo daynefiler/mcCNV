@@ -116,7 +116,14 @@
   
   cs <- c(0.001, 0.5, 1, 1.5, 2.0, 2.5)
   nstates <- length(cs)
-  cp <- rep(prior, nstates); cp[which(cs == 1)] <- 1 - prior*nstates
+  if (prior > 1/nstates || prior < 0) {
+    if (prior < 0) {
+      stop("Invalid prior; must be greater than 0 and less than 1/", nstates)
+    }
+    prior <- 1/nstates
+    warning("Prior > 1/", nstates, "; using 1/", nstates, ".")
+  }
+  cp <- rep(prior, nstates); cp[which(cs == 1)] <- 1 - prior*(nstates - 1)
   
   it <- 1
   repeat {
