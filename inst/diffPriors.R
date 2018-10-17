@@ -81,7 +81,7 @@ slurm_apply(f = doCalc,
                                  'cpus-per-task' = 1,
                                  error =  "%A_%a.err",
                                  output = "%A_%a.out",
-                                 time = "96:00:00"))
+                                 time = "10-00:00:00"))
 
 
 

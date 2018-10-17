@@ -171,3 +171,6 @@
   
 }
 
+
+lse <- function(x) log(sum(exp(x - max(x)))) + max(x)
+

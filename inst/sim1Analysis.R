@@ -23,7 +23,7 @@ all(mkdirs)
 pars <- expand.grid(dep = deps, cw = cws, rep = seq(200))
 pars <- as.data.table(pars)
 pars[ , wdir := wdir]
-pars[ , prior := 0.05]
+pars[ , prior := 0.06]
 
 doCalc <- function(prior, dep, cw, rep, wdir) {
   ifile <- sprintf("sim_d%0.3d_w%0.1d_r%0.4d.RDS", dep, cw, rep)
@@ -66,11 +66,11 @@ slurm_apply(f = doCalc,
             slurm_options = list(mem = 16000,
                                  array = sprintf("0-%d%%%d", 
                                                  nrow(pars) - 1, 
-                                                 500),
+                                                 300),
                                  'cpus-per-task' = 1,
                                  error =  "%A_%a.err",
                                  output = "%A_%a.out",
-                                 time = "96:00:00"))
+                                 time = "10-00:00:00"))
 
 
 ##----------------------------------------------------------------------------##
