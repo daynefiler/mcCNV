@@ -10,19 +10,20 @@ cnvGetCounts(bamfile, int, outfile = NULL, results = TRUE,
 \arguments{
 \item{bamfile}{Character of length 1, the file path to the .bam file}
 
+\item{int}{GRanges object containing the intervals (exons) to count reads
+into}
+
 \item{outfile}{Character of length 1, the file path to write results (.csv),
 no results written if NULL}
 
 \item{verbose}{TRUE/FALSE, if TRUE progress messages will be sent to the 
 console}
 
-\item{bedfile}{Character of length 1, the file path ot the interval file}
-
 \item{return}{TRUE/FALSE, should the results be returned to the console?
 Should not be FALSE if outfile is NULL}
 }
 \value{
-IRanges object with reference intervals
+data.table object with counts for the intervals given in int
 }
 \description{
 \code{cnvGetCounts} takes a bam file and an interval file and
