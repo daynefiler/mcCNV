@@ -146,7 +146,8 @@ cnvReadRefs <- function(bamfile) {
 #' @return GRanges object with reference intervals
 #' 
 #' @import data.table
-#' @importFrom GenomicRanges GRanges seqnames ranges 
+#' @importFrom GenomicRanges GRanges 
+#' @importFrom GenomeInfoDb seqnames
 #' @importClassesFrom GenomicRanges GRanges
 #' @export 
 
@@ -174,7 +175,8 @@ cnvInt2GRange <- function(intfile, pad = NULL, skip = 0) {
 #' 
 #' @importFrom IRanges IRanges
 #' @importClassesFrom IRanges IRanges
-#' @importFrom GenomicRanges GRanges seqnames ranges 
+#' @importFrom GenomicRanges GRanges ranges
+#' @importFrom GenomeInfoDb seqnames
 #' @importClassesFrom GenomicRanges GRanges
 #' @export 
 
