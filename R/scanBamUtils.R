@@ -153,7 +153,6 @@ cnvReadRefs <- function(bamfile) {
 cnvInt2GRange <- function(intfile, pad = NULL, skip = 0) {
   int <- fread(intfile, header = FALSE, sep = "\t", skip = skip)[[1]]
   int <- GRanges(int)
-  mcols(int)["ref"] <- int
   if (!is.null(pad)) int <- .padGRanges(int)
   names(int) <- paste(seqnames(int), ranges(int), sep = ":")
   int
