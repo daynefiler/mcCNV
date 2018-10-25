@@ -68,13 +68,14 @@
 #' Need to add
 #' 
 #' @import data.table
+#' @importFrom Rfast rowsums
 
 .clpsExon <- function(dat, cw) {
   
   dat <- dat[ , 
               shift(.SD, 1:cw - 1, type = "lead", give.names = TRUE), 
               by = sbj]
-  dat[ , N := rowSums(.SD), .SDcols = grep("^N_lead", colnames(dat))]
+  dat[ , N := rowsums(.SD), .SDcols = grep("^N_lead", colnames(dat))]
   dat[ , 
        ref := do.call(paste, c(.SD, sep = ":")), 
        .SDcols = grep("ref", colnames(dat))]
@@ -107,7 +108,8 @@
 #' @details 
 #' Need to add
 #' 
-#' @importFrom Rfast rowMaxs rowsums
+#' @importFrom Rfast rowMaxs
+#' @importFrom matrixStats rowLogSumExps
 #' @import data.table
 
 .callCN <- function(cnts, min.dlt, max.its, prior, shrink = TRUE) {
@@ -147,14 +149,16 @@
     cnts <- shrPhi[ , list(ref, phi)][cnts]
     setkey(cnts, sbj, ref)
     cnts[ , oldCN := CN]
-    calcProb <- function(x) cnts[ , dnbinom(N, sf/phi, 1/(mn*phi*x + 1))]
+    calcProb <- function(x) {
+      cnts[ , dnbinom(N, sf/phi, 1/(mn*phi*x + 1), log = TRUE)]
+    }
     probMat <- do.call(cbind, lapply(cs, calcProb))
-    probMat <- sweep(probMat, 2, cp, "*")
-    psum <- rowsums(probMat)
+    probMat <- sweep(probMat, 2, log(cp), "+")
+    psum <- rowLogSumExps(probMat, na.rm = TRUE)
     cnts[ , CN := cs[rowMaxs(probMat)]]
-    cnts[ , lk := rowMaxs(probMat, value = TRUE)]
-    cnts[ , post  := lk/psum]
-    cnts[ , post1 := probMat[ , cs == 1]/psum]
+    cnts[ , llk := rowMaxs(probMat, value = TRUE)]
+    cnts[ , post  := exp(llk - psum)]
+    cnts[ , post1 := exp(probMat[ , cs == 1] - psum)]
     rm(probMat); gc()
     nchng <- cnts[oldCN != CN, .N]
     
@@ -170,7 +174,4 @@
   cnts[]
   
 }
-
-
-lse <- function(x) log(sum(exp(x - max(x)))) + max(x)
 
