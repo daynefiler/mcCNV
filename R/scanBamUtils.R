@@ -199,6 +199,23 @@ cnvBed2GRange <- function(bedfile, pad = NULL, skip = 0) {
 }
 
 
+#' @name procReads
+#' @title Process reads from a bam file 
+#' 
+#' @param rds data.table with reads 
+#' @param int GRanges object with refs
+#' @param verbose verbose
+#' 
+#' @description This help file needs a lot of work
+#' 
+#' @importFrom IRanges IRanges findOverlapPairs
+#' @importClassesFrom IRanges IRanges
+#' @importFrom GenomicRanges GRanges ranges
+#' @importFrom GenomeInfoDb seqnames
+#' @importClassesFrom GenomicRanges GRanges
+#' @importFrom S4Vectors elementMetadata elementMetadata<-
+#' @importFrom stats rbinom
+
 .procReads <- function(rds, int, verbose) {
   
   ## Initialize column to store the filter flags

@@ -24,10 +24,11 @@
 #' @return data.table object with counts for the intervals given in int
 #' 
 #' @import data.table
-#' @importFrom utils strcapture
-#' @importFrom IRanges IRanges findOverlapPairs
+#' @importFrom IRanges IRanges
 #' @importClassesFrom IRanges IRanges
-#' @importFrom S4Vectors elementMetadata elementMetadata<-
+#' @importFrom GenomicRanges GRanges
+#' @importFrom GenomeInfoDb seqnames
+#' @importClassesFrom GenomicRanges GRanges
 #' @export 
 
 
@@ -63,8 +64,8 @@ cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL,
   
   ## Get reference intervals from bamfile 
   ref <- scanBamHeader(bamfile, what = "targets")[[1]][[1]]
+  ref <- ref[as.character(unique(seqnames(int)))]
   ref <- GRanges(names(ref), IRanges(start = 1, width = ref))
-  ref <- ref[seqnames(ref) %in% unique(seqnames(int))]
   
   ## Load reads from bamfile that span the given reference 
   flds <- c("qname", "flag", "strand", "rname", "pos", "mapq", 
@@ -88,6 +89,7 @@ cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL,
     
   }
   
+  cts <- cts[!sapply(cts, is.null)]
   cts <- rbindlist(cts)
   cts[ , sbj := sbj]
   

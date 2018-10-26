@@ -16,7 +16,7 @@ into}
 \item{sbj}{Character or numeric of length 1, the subject name for bam file; 
 defaults to the input filename when NULL}
 
-\item{outfile}{Character of length 1, the file path to write results (.csv),
+\item{outfile}{Character of length 1, the file path to write results (.RDS),
 no results written if NULL}
 
 \item{verbose}{TRUE/FALSE, if TRUE progress messages will be sent to the 
