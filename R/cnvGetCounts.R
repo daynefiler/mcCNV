@@ -64,6 +64,7 @@ cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL,
   ## Get reference intervals from bamfile 
   ref <- scanBamHeader(bamfile, what = "targets")[[1]][[1]]
   ref <- GRanges(names(ref), IRanges(start = 1, width = ref))
+  ref <- ref[seqnames(ref) %in% unique(seqnames(int))]
   
   ## Load reads from bamfile that span the given reference 
   flds <- c("qname", "flag", "strand", "rname", "pos", "mapq", 
