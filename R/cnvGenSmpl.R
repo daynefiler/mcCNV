@@ -38,14 +38,16 @@ cnvGenSmpl <- function(nr, pe, cw, seed = NULL,
   states <- sample(cs, ne, TRUE, pc)
   if (cw > 1 || length(cw > 1)) {
     ind <- which(states != 1)
-    if (length(cw) > 1) {
-      cws <- sample(cw, size = length(ind), replace = TRUE)
-      ind2 <- unlist(mapply(seq, ind, length = cws))
-      states[ind2] <- unlist(mapply(rep, states[ind], each = cws))
-    } else {
-      states[sapply(ind, seq, length = cw)] <- rep(states[ind], each = cw)
+    if (length(ind) > 0) {
+      if (length(cw) > 1) {
+        cws <- sample(cw, size = length(ind), replace = TRUE)
+        ind2 <- unlist(mapply(seq, ind, length = cws))
+        states[ind2] <- unlist(mapply(rep, states[ind], each = cws))
+      } else {
+        states[sapply(ind, seq, length = cw)] <- rep(states[ind], each = cw)
+      }
+      states <- states[seq(ne)]
     }
-    states <- states[seq(ne)]
   }
   adj_pe <- states*pe
   adj_pe <- adj_pe/sum(adj_pe)

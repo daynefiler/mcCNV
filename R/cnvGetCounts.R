@@ -12,7 +12,9 @@
 #' @param bamfile Character of length 1, the file path to the .bam file
 #' @param int GRanges object containing the intervals (exons) to count reads
 #' into
-#' @param outfile Character of length 1, the file path to write results (.csv),
+#' @param sbj Character or numeric of length 1, the subject name for bam file; 
+#' defaults to the input filename when NULL
+#' @param outfile Character of length 1, the file path to write results (.RDS),
 #' no results written if NULL
 #' @param return TRUE/FALSE, should the results be returned to the console?
 #' Should not be FALSE if outfile is NULL
@@ -29,8 +31,8 @@
 #' @export 
 
 
-cnvGetCounts <- function(bamfile, int, outfile = NULL, results = TRUE, 
-                         verbose = FALSE) {
+cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL, 
+                         results = TRUE, verbose = FALSE) {
   
   ## Check input parameters
   if (is.null(outfile) & !results) {
@@ -47,6 +49,16 @@ cnvGetCounts <- function(bamfile, int, outfile = NULL, results = TRUE,
     }
   } else {
     stop("'bamfile' must be a character of length 1 and point to a valid file.")
+  }
+  
+  if (is.null(sbj)) {
+    sbj <- sub(".bam$", "", bamfile)
+  } else {
+    if (length(sbj) > 1) {
+      warning("length(sbj) > 1, only using the first element")
+      sbj <- sbj[1]
+    }
+    if (!is.character(sbj)) sbj <- as.character(sbj)
   }
   
   ## Get reference intervals from bamfile 
@@ -76,11 +88,12 @@ cnvGetCounts <- function(bamfile, int, outfile = NULL, results = TRUE,
   }
   
   cts <- rbindlist(cts)
+  cts[ , sbj := sbj]
   
   ## Write ouputs
   if (!is.null(outfile)) {
     if (verbose) cat("Writing output file...")
-    fwrite(cts, file = outfile)
+    saveRDS(cts, file = outfile)
     if (verbose) cat("done.\n")
   }
   

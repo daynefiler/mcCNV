@@ -4,14 +4,17 @@
 \alias{cnvGetCounts}
 \title{Given bam and int files, return molecule counts per interval}
 \usage{
-cnvGetCounts(bamfile, int, outfile = NULL, results = TRUE,
-  verbose = FALSE)
+cnvGetCounts(bamfile, int, sbj = NULL, outfile = NULL,
+  results = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{bamfile}{Character of length 1, the file path to the .bam file}
 
 \item{int}{GRanges object containing the intervals (exons) to count reads
 into}
+
+\item{sbj}{Character or numeric of length 1, the subject name for bam file; 
+defaults to the input filename when NULL}
 
 \item{outfile}{Character of length 1, the file path to write results (.csv),
 no results written if NULL}
