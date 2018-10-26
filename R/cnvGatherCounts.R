@@ -22,6 +22,7 @@ cnvGatherCounts <- function(input, outfile = NULL, results = TRUE) {
   fls <- input[file_test("-f", input)]
   drs <- input[file_test("-d", input)]
   fls <- c(fls, sapply(drs, list.files, full.names = TRUE))
+  fls <- unlist(fls, use.names = FALSE)
   
   cts <- lapply(fls, readRDS)
   cts <- rbindlist(cts)
