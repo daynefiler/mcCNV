@@ -62,30 +62,35 @@ cnvAggCall <- function(dat, width = 5) {
   dat[ , refn := as.integer(sub("ref", "", sngl))]
   
   s1 <- dat[which(C1), list(sbj, refn, width, loc)]
-  ind <- s1[ , rep(refn, width) + unlist(sapply(width, seq)) - rep(loc, width)]
-  s1 <- s1[rep(seq(.N), width)]
-  s1[ , ind := ind]
-  rm(ind); gc()
-  setkey(dat, sbj, refn)
-  cols <- c("ref", lkcol, "C1", "loc", "width")
-  cnms <- c("ref", lkcol, "C1", "altl", "altw")
-  s1[ , (cnms) := dat[s1[ , list(sbj, ind)], .SD, .SDcols = cols]]
-  
-  s1 <- s1[!is.na(C1)][(C1)]
-  setorderv(s1, c("sbj", "refn", lkcol), c(1, 1, -1))
-  
-  ind <- s1[ , list(ind = .I[1]), by = list(sbj, refn)]$ind
-  s2 <- s1[ind]
-  rm(ind); gc()
-  s2[ , lbnd := ind + 1    - altl]
-  s2[ , ubnd := ind + altw - altl]
-  s2[ , C2 := refn >= lbnd & refn <= ubnd]
-  
-  setkey(dat, sbj, refn)
-  setkey(s2, sbj, refn)
-  
-  dat <- s2[ , list(sbj, refn, C2)][dat]
-  dat[is.na(C2), C2 := FALSE]
+  if (s1[ , .N] > 0) {
+    ind <- s1[ , 
+              rep(refn, width) + unlist(sapply(width, seq)) - rep(loc, width)]
+    s1 <- s1[rep(seq(.N), width)]
+    s1[ , ind := ind]
+    rm(ind); gc()
+    setkey(dat, sbj, refn)
+    cols <- c("ref", lkcol, "C1", "loc", "width")
+    cnms <- c("ref", lkcol, "C1", "altl", "altw")
+    s1[ , (cnms) := dat[s1[ , list(sbj, ind)], .SD, .SDcols = cols]]
+    
+    s1 <- s1[!is.na(C1)][(C1)]
+    setorderv(s1, c("sbj", "refn", lkcol), c(1, 1, -1))
+    
+    ind <- s1[ , list(ind = .I[1]), by = list(sbj, refn)]$ind
+    s2 <- s1[ind]
+    rm(ind); gc()
+    s2[ , lbnd := ind + 1    - altl]
+    s2[ , ubnd := ind + altw - altl]
+    s2[ , C2 := refn >= lbnd & refn <= ubnd]
+    
+    setkey(dat, sbj, refn)
+    setkey(s2, sbj, refn)
+    
+    dat <- s2[ , list(sbj, refn, C2)][dat]
+    dat[is.na(C2), C2 := FALSE]
+  } else {
+    dat[ , C2 := FALSE]
+  }
   
   dat[]
   
