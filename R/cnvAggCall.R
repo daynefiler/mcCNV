@@ -53,7 +53,7 @@ cnvAggCall <- function(dat, width = 5) {
   ## values by the width. 
   # if (weight)  dat[ , wtlk := lk*width]
   # lkcol <- ifelse(weight, "wtlk", "lk")
-  lkcol <- "lk"
+  lkcol <- "p"
   setorderv(dat, c("sbj", "sngl", lkcol), c(1, 1, -1))
   ind <- dat[ , list(ind = .I[1]), by = list(sbj, sngl)]$ind
   dat <- dat[ind]

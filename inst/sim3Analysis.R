@@ -1,5 +1,5 @@
 ##----------------------------------------------------------------------------##
-## Script to do the analysis on the whole simulation at prior of 0.03
+## Script to do the analysis on the whole simulation 3 at prior of 0.06
 ##----------------------------------------------------------------------------##
 
 library(cnvR)
@@ -9,34 +9,33 @@ library(data.table)
 ## Directory with simulated data
 wdir <- file.path("/", "projects", "sequence_analysis", "vol5", 
                   "dfiler", "CNV")
-idir <- file.path(wdir, "sim1Data")
+idir <- file.path(wdir, "sim3Data")
 deps <- seq(5, 100, 5) ## Sequencing depths 
-cws <- 1:5 ## Sizes of cnvs (number of exons spanned) 
+
 
 ## Set up the file system
-odir <- file.path(wdir, "sim1Analysis")
-depDir <- with(expand.grid(deps, cws),
-               sprintf("d%0.3d/w%0.1d", Var1, Var2))
+odir <- file.path(wdir, "sim3Analysis")
+depDir <- sprintf("d%0.3d", deps)
 mkdirs <- sapply(file.path(odir, depDir), dir.create, recursive = TRUE)
 all(mkdirs)
 
-pars <- expand.grid(dep = deps, cw = cws, rep = seq(200))
+pars <- expand.grid(dep = deps, rep = seq(200))
 pars <- as.data.table(pars)
 pars[ , wdir := wdir]
 pars[ , prior := 0.06]
 
-doCalc <- function(prior, dep, cw, rep, wdir) {
-  ifile <- sprintf("sim_d%0.3d_w%0.1d_r%0.4d.RDS", dep, cw, rep)
-  idir <- file.path(sprintf("d%0.3d", dep), sprintf("w%0.1d", cw))
-  dat <- readRDS(file.path(wdir, "sim1Data", idir, ifile))
+doCalc <- function(prior, dep, rep, wdir) {
+  ifile <- sprintf("sim_d%0.3d_r%0.4d.RDS", dep, rep)
+  idir <- file.path(sprintf("d%0.3d", dep))
+  dat <- readRDS(file.path(wdir, "sim3Data", idir, ifile))
   priorFmt <- sub("0.", "", sprintf("p%0.4f", prior))
-  ofile <- sprintf("sRes_%s_d%0.3d_w%0.1d_r%0.4d.RDS", priorFmt, dep, cw, rep)
-  out <- file.path(wdir, "sim1Analysis", idir, ofile)
+  ofile <- sprintf("sRes_%s_d%0.3d_r%0.4d.RDS", priorFmt, dep, rep)
+  out <- file.path(wdir, "sim3Analysis", idir, ofile)
   kp <- c("ref", "sbj", "N", "actCN", "mn", "phi", "width", "CN", "p", "p1")
   smpls <- try(cnvCallCN(cnts = dat, 
-                         prior = prior, 
+                         prior = 0.00001, 
                          outfile = out,
-                         agg = TRUE, 
+                         agg = FALSE, 
                          shrink = TRUE,
                          keep.cols = kp, 
                          width = 5,
@@ -50,7 +49,6 @@ doCalc <- function(prior, dep, cw, rep, wdir) {
     setorder(res, -ACT, -C1, -C2, -PRO)
     res[ , prior := prior]
     res[ , dep := dep]
-    res[ , width := cw]
     res[ , rep := rep]
     return(res[])
   } else {
@@ -62,19 +60,13 @@ slurm_apply(f = doCalc,
             params = pars, 
             nodes = nrow(pars),
             cpus_per_node = 1,
-            jobname = "sim1Analysis", 
+            jobname = "sim3Analysis", 
             slurm_options = list(mem = 16000,
                                  array = sprintf("0-%d%%%d", 
                                                  nrow(pars) - 1, 
-                                                 300),
+                                                 1000),
                                  'cpus-per-task' = 1,
                                  error =  "%A_%a.err",
                                  output = "%A_%a.out",
                                  time = "10-00:00:00"))
-
-
-
-
-
-
 

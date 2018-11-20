@@ -31,7 +31,7 @@ doCalc <- function(prior, dep, rep, wdir) {
   priorFmt <- sub("0.", "", sprintf("p%0.4f", prior))
   ofile <- sprintf("sRes_%s_d%0.3d_r%0.4d.RDS", priorFmt, dep, rep)
   out <- file.path(wdir, "sim2Analysis", idir, ofile)
-  kp <- c("ref", "sbj", "N", "actCN", "mn", "phi", "width", "CN", "lk", "lk1")
+  kp <- c("ref", "sbj", "N", "actCN", "mn", "phi", "width", "CN", "p", "p1")
   smpls <- try(cnvCallCN(cnts = dat, 
                          prior = prior, 
                          outfile = out,
@@ -69,39 +69,4 @@ slurm_apply(f = doCalc,
                                  error =  "%A_%a.err",
                                  output = "%A_%a.out",
                                  time = "10-00:00:00"))
-
-
-##----------------------------------------------------------------------------##
-## After the job finishes...
-##----------------------------------------------------------------------------##
-
-library(cnvR)
-library(rslurm)
-library(data.table)
-library(lattice)
-library(latticeExtra)
-library(RColorBrewer)
-
-col2alpha <- function(col, alpha = 0.5) {
-  tmp <- col2rgb(col)
-  rgb(tmp[1]/255, tmp[2]/255, tmp[3]/255, alpha)  
-}
-
-calcMCC <- function(tp, tn, fp, fn) {
-  tp <- as.numeric(tp)
-  tn <- as.numeric(tn)
-  fp <- as.numeric(fp)
-  fn <- as.numeric(fn)
-  (tp*tn - fp*fn)/(sqrt((tp + fp)*(tp + fn)*(tn + fp)*(tn + fn)))
-}
-
-# sjob <- slurm_job("sim2Analysis", 20000)
-# res <- get_slurm_out(sjob, ncores = 60)
-# res <- rbindlist(res)
-# saveRDS(res, "sim2Analysis.RDS")
-res <- procRes(readRDS("sim2Analysis.RDS"))
-
-pltStat(res[[1]], res[[2]], "tpr", "TPR", 0.95)
-pltStat(res[[1]], res[[2]], "pf", "FP/(TP + FP)", 0.05)
-pltStat(res[[1]], res[[2]], "mcc", "MCC", 0.95)
 
