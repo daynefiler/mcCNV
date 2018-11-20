@@ -156,8 +156,8 @@
     psum <- rowLogSumExps(probMat, na.rm = TRUE)
     cnts[ , CN := cs[rowMaxs(probMat)]]
     cnts[ , llk := rowMaxs(probMat, value = TRUE)]
-    cnts[ , p  := exp(llk - psum)]
-    cnts[ , p1 := exp(probMat[ , cs == 1] - psum)]
+    cnts[ , p  := llk - psum]
+    cnts[ , p1 := probMat[ , cs == 1] - psum]
     rm(probMat); gc()
     nchng <- cnts[oldCN != CN, .N]
     
