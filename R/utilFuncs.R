@@ -68,14 +68,13 @@
 #' Need to add
 #' 
 #' @import data.table
-#' @importFrom Rfast rowsums
 
 .clpsExon <- function(dat, cw) {
   
   dat <- dat[ , 
               shift(.SD, 1:cw - 1, type = "lead", give.names = TRUE), 
               by = sbj]
-  dat[ , N := rowsums(.SD), .SDcols = grep("^N_lead", colnames(dat))]
+  dat[ , N := rowSums(.SD), .SDcols = grep("^N_lead", colnames(dat))]
   dat[ , 
        ref := do.call(paste, c(.SD, sep = ":")), 
        .SDcols = grep("ref", colnames(dat))]
