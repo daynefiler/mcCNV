@@ -97,44 +97,40 @@ calcMCC <- function(tp, tn, fp, fn) {
   (tp*tn - fp*fn)/(sqrt((tp + fp)*(tp + fn)*(tn + fp)*(tn + fn)))
 }
 
-# sjob <- slurm_job("sim1Analysis", 20000)
-# res <- get_slurm_out(sjob)
-# res <- rbindlist(res)
-# saveRDS(res, "sim1Analysis.RDS")
-res <- readRDS("sim1Analysis.RDS")
-
-res[ , fdep := as.factor(dep)]
-res[ , fwid := as.factor(width)]
-
-resSmry <- res[ , 
-                list(tp = sum(N[ ACT &  C1]),
-                     fp = sum(N[!ACT &  C1 & !PRO]),
-                     tn = sum(N[!ACT & !C1]),
-                     fn = sum(N[ ACT & !C1])),
-                by = list(prior, fdep, fwid, rep)]
-
-resSmry[ , fpr := fp/(fp + tn)]
-resSmry[ , tpr := tp/(tp + fn)]
-resSmry[ , spc := tn/(fp + tn)]
-resSmry[ , pf  := fp/(fp + tp)]
-resSmry[ , mcc := calcMCC(tp, tn, fp, fn)]
-
-resMn <- resSmry[ , lapply(.SD, mean), by = list(prior, fdep, fwid)]
-resSD <- resSmry[ , lapply(.SD, sd),   by = list(prior, fdep, fwid)]
+procRes <- function(x) {
+  if (!"width" %in% names(x)) x[ , width := 1L]
+  x[ , fdep := as.factor(dep)]
+  x[ , fwid := as.factor(width)]
+  x[ , N := as.numeric(N)]
+  xSmry <- x[ , 
+              list(tp = sum(N[ ACT &  C1]),
+                   fp = sum(N[!ACT &  C1 & !PRO]),
+                   tn = sum(N[!ACT & !C1]),
+                   fn = sum(N[ ACT & !C1])),
+              by = list(prior, fdep, fwid, rep)]
+  xSmry[ , fpr := fp/(fp + tn)]
+  xSmry[ , tpr := tp/(tp + fn)]
+  xSmry[ , spc := tn/(fp + tn)]
+  xSmry[ , pf  := fp/(fp + tp)]
+  xSmry[ , mcc := calcMCC(tp, tn, fp, fn)]
+  xMn <- xSmry[ , lapply(.SD, mean), by = list(prior, fdep, fwid)]
+  xSD <- xSmry[ , lapply(.SD, sd),   by = list(prior, fdep, fwid)]
+  list(xMn, xSD)
+}
 
 pltStat <- function(mndat, sddat, stat, ylab, h) {
   plot.new()
   plot.window(ylim = c(0, 1), xlim = c(5, 100))
   abline(h = h, lty = "dashed", col = "darkgrey")
   abline(v = seq(5, 100, 5), lty = "dotted", col = "lightgrey")
-  for (i in 1:5) {
+  for (i in 1:length(unique(mndat$fwid))) {
     fdep <- mndat[order(fdep)][fwid == i, as.numeric(as.character(fdep))]
     sval <- mndat[order(fdep)][fwid == i, get(stat)]
     SD   <- sddat[order(fdep)][fwid == i, get(stat)]
-    cols <- brewer.pal(9, "Blues")[i + 3]
-    lines(fdep, sval, col = cols)
+    cols <- c(brewer.pal(9, "Blues")[4:8], "darkorange")[i]
+    lines(fdep, sval, col = cols, lwd = 2)
     polygon(x = c(fdep, rev(fdep)), 
-            y = c(sval + SD, rev(sval - SD)), 
+            y = c(sval + 3*SD, rev(sval - 3*SD)), 
             col = col2alpha(cols, alpha = 0.25), 
             border = NA)
   }
@@ -144,16 +140,35 @@ pltStat <- function(mndat, sddat, stat, ylab, h) {
   mtext(ylab, side = 2, line = 3)
 }
 
-pltStat(resMn, resSD, "tpr", "TPR", 0.95)
-pltStat(resMn, resSD, "pf", "FP/(TP + FP)", 0.05)
-pltStat(resMn, resSD, "mcc", "MCC", 0.95)
+# sjob <- slurm_job("sim1Analysis", 20000)
+# res <- get_slurm_out(sjob, ncores = 60)
+# res <- rbindlist(res)
+# saveRDS(res, "sim1Analysis.RDS")
+res <- procRes(readRDS("sim1Analysis.RDS"))
+
+pdf("tmp.pdf", width = 11, height = 6, pointsize = 13)
+par(mfrow = c(1, 2), mar = c(5, 4, 1, 1))
+pltStat(res[[1]], res[[2]], "tpr", "TPR", 0.95)
+pltStat(res[[1]], res[[2]], "pf", "FP/(TP + FP)", 0.05)
+graphics.off()
+pltStat(res[[1]], res[[2]], "mcc", "MCC", 0.95)
 
 graphics.off()
 
 
 
-
-
+s1 <- readRDS("sim1Analysis.RDS")
+s2 <- readRDS("sim2Analysis.RDS")
+invisible(s2[ , width := 6])
+setcolorder(s2, names(s1))
+sDat <- procRes(rbindlist(list(s1, s2)))
+pdf("~/Github/cnvR/tmp2.pdf", width = 12, height = 6, pointsize = 13)
+par(mfrow = c(1, 2), mar = c(5, 4, 1, 1))
+pltStat(sDat[[1]], sDat[[2]], 
+        stat = "tpr", ylab = "TPR", h = 0.95)
+pltStat(sDat[[1]], sDat[[2]], 
+        stat = "pf", ylab = "FP/(TP + FP)", h = 0.05)
+graphics.off()
 
 
 

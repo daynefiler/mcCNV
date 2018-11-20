@@ -86,7 +86,7 @@ cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL,
     setorder(rds, qname, strand)
     if (verbose) cat("done.\n")
     cts[[r]] <- .procReads(rds, int[seqnames(int) == r], verbose = verbose)
-    
+    cts[[r]][ , chr := ref]
   }
   
   cts <- cts[!sapply(cts, is.null)]

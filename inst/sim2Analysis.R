@@ -96,56 +96,12 @@ calcMCC <- function(tp, tn, fp, fn) {
 }
 
 # sjob <- slurm_job("sim2Analysis", 20000)
-# res <- get_slurm_out(sjob)
+# res <- get_slurm_out(sjob, ncores = 60)
 # res <- rbindlist(res)
 # saveRDS(res, "sim2Analysis.RDS")
-res <- readRDS("sim2Analysis.RDS")
+res <- procRes(readRDS("sim2Analysis.RDS"))
 
-res[ , fdep := as.factor(dep)]
-res[ , fwid := as.factor(1)]
-
-resSmry <- res[ , 
-                list(tp = sum(N[ ACT &  C1]),
-                     fp = sum(N[!ACT &  C1 & !PRO]),
-                     tn = sum(N[!ACT & !C1]),
-                     fn = sum(N[ ACT & !C1])),
-                by = list(prior, fdep, fwid, rep)]
-
-resSmry[ , fpr := fp/(fp + tn)]
-resSmry[ , tpr := tp/(tp + fn)]
-resSmry[ , spc := tn/(fp + tn)]
-resSmry[ , pf  := fp/(fp + tp)]
-resSmry[ , mcc := calcMCC(tp, tn, fp, fn)]
-
-resMn <- resSmry[ , lapply(.SD, mean), by = list(prior, fdep, fwid)]
-resSD <- resSmry[ , lapply(.SD, sd),   by = list(prior, fdep, fwid)]
-
-pltStat <- function(mndat, sddat, stat, ylab, h) {
-  plot.new()
-  plot.window(ylim = c(0, 1), xlim = c(5, 100))
-  abline(h = h, lty = "dashed", col = "darkgrey")
-  abline(v = seq(5, 100, 5), lty = "dotted", col = "lightgrey")
-  for (i in 1:5) {
-    fdep <- mndat[order(fdep)][fwid == i, as.numeric(as.character(fdep))]
-    sval <- mndat[order(fdep)][fwid == i, get(stat)]
-    SD   <- sddat[order(fdep)][fwid == i, get(stat)]
-    cols <- brewer.pal(9, "Blues")[i + 3]
-    lines(fdep, sval, col = cols)
-    polygon(x = c(fdep, rev(fdep)), 
-            y = c(sval + SD, rev(sval - SD)), 
-            col = col2alpha(cols, alpha = 0.25), 
-            border = NA)
-  }
-  axis(side = 1, at = seq(10, 100, by = 10))
-  axis(side = 2)
-  mtext("Depth", side = 1, line = 3)
-  mtext(ylab, side = 2, line = 3)
-}
-
-pltStat(resMn, resSD, "tpr", "TPR", 0.95)
-pltStat(resMn, resSD, "pf", "FP/(TP + FP)", 0.05)
-pltStat(resMn, resSD, "mcc", "MCC", 0.95)
-
-graphics.off()
-
+pltStat(res[[1]], res[[2]], "tpr", "TPR", 0.95)
+pltStat(res[[1]], res[[2]], "pf", "FP/(TP + FP)", 0.05)
+pltStat(res[[1]], res[[2]], "mcc", "MCC", 0.95)
 
