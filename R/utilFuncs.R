@@ -71,12 +71,14 @@
 
 .clpsExon <- function(dat, cw) {
   
+  setorder(dat, ref)
+  shiftby <- if ("chr" %in% names(dat)) c("sbj", "chr") else "sbj"
   dat <- dat[ , 
               shift(.SD, 1:cw - 1, type = "lead", give.names = TRUE), 
-              by = sbj]
+              by = shiftby]
   dat[ , N := rowSums(.SD), .SDcols = grep("^N_lead", colnames(dat))]
   dat[ , 
-       ref := do.call(paste, c(.SD, sep = ":")), 
+       ref := do.call(paste, c(.SD, sep = ";")), 
        .SDcols = grep("ref", colnames(dat))]
   if (any(grepl("actCN", colnames(dat)))) {
     dat[ ,
@@ -156,8 +158,8 @@
     psum <- rowLogSumExps(probMat, na.rm = TRUE)
     cnts[ , CN := cs[rowMaxs(probMat)]]
     cnts[ , llk := rowMaxs(probMat, value = TRUE)]
-    cnts[ , p  := llk - psum]
-    cnts[ , p1 := probMat[ , cs == 1] - psum]
+    cnts[ , lp  := llk - psum]
+    cnts[ , lp1 := probMat[ , cs == 1] - psum]
     rm(probMat); gc()
     nchng <- cnts[oldCN != CN, .N]
     

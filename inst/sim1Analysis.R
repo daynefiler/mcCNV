@@ -32,7 +32,7 @@ doCalc <- function(prior, dep, cw, rep, wdir) {
   priorFmt <- sub("0.", "", sprintf("p%0.4f", prior))
   ofile <- sprintf("sRes_%s_d%0.3d_w%0.1d_r%0.4d.RDS", priorFmt, dep, cw, rep)
   out <- file.path(wdir, "sim1Analysis", idir, ofile)
-  kp <- c("ref", "sbj", "N", "actCN", "mn", "phi", "width", "CN", "p", "p1")
+  kp <- c("ref", "sbj", "N", "actCN", "mn", "phi", "width", "CN", "lp", "lp1")
   smpls <- try(cnvCallCN(cnts = dat, 
                          prior = prior, 
                          outfile = out,
@@ -46,8 +46,8 @@ doCalc <- function(prior, dep, cw, rep, wdir) {
     makeNull <- function(x) paste(rep(1, x), collapse = ":")
     smpls[ , null := sapply(width, makeNull)]
     smpls[ , PRO := actCN != null]
-    res <- smpls[ , .N, by = list(ACT, C1, C2, PRO)]
-    setorder(res, -ACT, -C1, -C2, -PRO)
+    res <- smpls[ , .N, by = list(ACT, C1, PRO)]
+    setorder(res, -ACT, -C1, -PRO)
     res[ , prior := prior]
     res[ , dep := dep]
     res[ , width := cw]

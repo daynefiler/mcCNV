@@ -20,7 +20,4 @@ Need to add
 
 C1 -- TRUE if any interval of the given width that overlaps the exon was
 called a CNV
-C2 -- TRUE only over the interval that had the greatest likelihood (this 
-is a subset of C1, eg look where there were positive calls, then subset
-down to the most likely interval within the C1 calls)
 }
