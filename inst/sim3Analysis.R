@@ -33,7 +33,7 @@ doCalc <- function(prior, dep, rep, wdir) {
   out <- file.path(wdir, "sim3Analysis", idir, ofile)
   kp <- c("ref", "sbj", "N", "actCN", "mn", "phi", "width", "CN", "lp", "lp1")
   smpls <- try(cnvCallCN(cnts = dat, 
-                         prior = 0.06, 
+                         prior = prior, 
                          outfile = out,
                          agg = TRUE, 
                          shrink = TRUE,

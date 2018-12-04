@@ -1,5 +1,5 @@
 ##----------------------------------------------------------------------------##
-## Script to do the analysis on the whole simulation at prior of 0.03
+## Script to do the analysis on the whole simulation at prior of 0.06
 ##----------------------------------------------------------------------------##
 
 library(cnvR)
@@ -66,7 +66,7 @@ slurm_apply(f = doCalc,
             slurm_options = list(mem = 16000,
                                  array = sprintf("0-%d%%%d", 
                                                  nrow(pars) - 1, 
-                                                 300),
+                                                 500),
                                  'cpus-per-task' = 1,
                                  error =  "%A_%a.err",
                                  output = "%A_%a.out",
