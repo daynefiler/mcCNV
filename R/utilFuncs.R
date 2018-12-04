@@ -15,7 +15,7 @@
   
   nPhi <- length(phi)
   xi <- seq(0, 1, length.out = 1000)
-  asd <- sapply(xi, function(x) 0.05/sum((phi - x)^2))
+  asd <- sapply(xi, function(x) 1/sum((phi - x)^2))
   xi <- xi[which.min(diff(asd)/diff(xi))]
   dlt <- (sum((phi - mean(phi))^2)/(nPhi - 1))/(sum((phi - xi)^2)/(nPhi - 2))
   sPhi <- (1 - dlt)*phi + dlt*xi
