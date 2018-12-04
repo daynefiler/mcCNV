@@ -58,7 +58,7 @@
     lines(fdep, sval, col = cols, lwd = 2)
     polygon(x = c(fdep, rev(fdep)), 
             y = c(sval + 3*SD, rev(sval - 3*SD)), 
-            col = col2alpha(cols, alpha = 0.25), 
+            col = .col2alpha(cols, alpha = 0.25), 
             border = NA)
   }
   axis(side = 1, at = seq(10, 100, by = 10))
@@ -66,3 +66,24 @@
   mtext("Depth", side = 1, line = 3)
   mtext(ylab, side = 2, line = 3)
 }
+
+#-------------------------------------------------------------------------------
+# addfiglab: Add a figure label
+#-------------------------------------------------------------------------------
+
+#' @name addfiglab
+#' @title Add a figure label
+#' @description Add a figure label based on x and y line values
+#'
+#' @export
+
+.addfiglab <- function(lab, xl = par()$mar[2], yl = par()$mar[3], cex = 1) {
+  
+  text(x = .line2user(xl, 2), y = .line2user(yl, 3), 
+       lab, xpd = NA, font = 2, cex = cex, adj = c(0, 1))
+  
+}
+
+#-------------------------------------------------------------------------------
+
+
