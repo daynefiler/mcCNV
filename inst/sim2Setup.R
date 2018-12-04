@@ -11,7 +11,7 @@ library(data.table)
 fdir <- file.path("/", "projects", "sequence_analysis", "vol5", 
                   "dfiler", "CNV", "sim2Data")
 deps <- seq(5, 100, 5) ## Sequencing depths 
-reps <- 1000 ## Number of repetitions 
+reps <- 200 ## Number of repetitions 
 Ne <- 172000 ## Number of exons
 Ns <- 16 ## Number of samples
 
