@@ -35,13 +35,12 @@ cnvAggCall <- function(dat, width = 5) {
   dat[ , tmp := paste0("r", loc)]
   rm(ind); gc()
   
-  for (i in cols) {
-    dat[tmp == i, sngl := get(i)]
-  }
+  for (i in cols) dat[tmp == i, sngl := get(i)]
   
   dat[ , (c(cols, "tmp")) := NULL]
   gc()
-  dat[ , C1 := any(CN != 1), by = list(sbj, sngl)]
+  dat[ , CNV := CN != 1]
+  dat[ , C1 := any(CNV), by = list(sbj, sngl)]
   
   if (any(grepl("actCN", colnames(dat)))) {
     dat[ ,
@@ -49,12 +48,13 @@ cnvAggCall <- function(dat, width = 5) {
          by = list(sbj, sngl)]
   }
   
-  setorder(dat, sbj, sngl, -lp)
+  
+  setorder(dat, sbj, sngl, -CNV, -lp)
   ind <- dat[ , list(ind = .I[1]), by = list(sbj, sngl)]$ind
+  dat[ , CNV := NULL]
   dat <- dat[ind]
   rm(ind); gc()
   
-  dat <- dat[!(C1 & CN == 1)]
   dat[]
   
 }
