@@ -12,8 +12,7 @@
 }
 
 .col2alpha <- function(col, alpha = 0.5) {
-  tmp <- col2rgb(col)
-  rgb(tmp[1]/255, tmp[2]/255, tmp[3]/255, alpha)
+  rgb(t(col2rgb(col))/255, alpha = alpha)
 }
 
 .calcMCC <- function(tp, tn, fp, fn) {
@@ -30,7 +29,7 @@
   x[ , fwid := as.factor(width)]
   x[ , N := as.numeric(N)]
   xSmry <- x[ , 
-              list(tp = sum(N[ ACT &  C1]),
+              list(tp = sum(N[ PRO &  C1]),
                    fp = sum(N[!ACT &  C1 & !PRO]),
                    tn = sum(N[!ACT & !C1]),
                    fn = sum(N[ ACT & !C1])),

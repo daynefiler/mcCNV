@@ -19,7 +19,8 @@ Ns <- 16 ## Number of samples
 if (dir.exists(fdir)) unlink(fdir, recursive = TRUE, force = TRUE)
 dir.create(fdir)
 depDir <- sprintf("d%0.3d", deps)
-sapply(file.path(fdir, depDir), dir.create, recursive = TRUE)
+mkdirs <- sapply(file.path(fdir, depDir), dir.create, recursive = TRUE)
+all(mkdirs)
 
 pars <- expand.grid(Ns = Ns, Ne = Ne, dep = deps, rep = seq(reps), fdir = fdir)
 pars <- as.data.table(pars)
@@ -43,7 +44,7 @@ slurm_apply(f = savePool,
             slurm_options = list(mem = 12000,
                                  array = sprintf("0-%d%%%d",
                                                  nrow(pars) - 1,
-                                                 1000),
+                                                 500),
                                  'cpus-per-task' = 1,
                                  error =  "%A_%a.err",
                                  output = "%A_%a.out",

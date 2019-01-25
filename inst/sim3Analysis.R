@@ -43,7 +43,9 @@ doCalc <- function(prior, dep, rep, wdir) {
   if (!is(smpls, 'try-error')) {
     smpls[ , ACT := actCNSngl != 1]
     makeNull <- function(x) paste(rep(1, x), collapse = ":")
-    smpls[ , null := sapply(width, makeNull)]
+    null <- data.table(width = 1:5, null = sapply(1:5, makeNull))
+    setkey(null, width)
+    smpls[ , null := null[J(smpls$width), null]]
     smpls[ , PRO := actCN != null]
     res <- smpls[ , .N, by = list(ACT, C1, PRO)]
     setorder(res, -ACT, -C1, -PRO)
@@ -64,7 +66,7 @@ slurm_apply(f = doCalc,
             slurm_options = list(mem = 16000,
                                  array = sprintf("0-%d%%%d", 
                                                  nrow(pars) - 1, 
-                                                 1000),
+                                                 500),
                                  'cpus-per-task' = 1,
                                  error =  "%A_%a.err",
                                  output = "%A_%a.out",

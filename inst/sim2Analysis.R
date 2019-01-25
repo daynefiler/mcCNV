@@ -19,7 +19,7 @@ depDir <- sprintf("d%0.3d", deps)
 mkdirs <- sapply(file.path(odir, depDir), dir.create, recursive = TRUE)
 all(mkdirs)
 
-pars <- expand.grid(dep = deps, rep = seq(1000))
+pars <- expand.grid(dep = deps, rep = seq(200))
 pars <- as.data.table(pars)
 pars[ , wdir := wdir]
 pars[ , prior := 0.06]
@@ -43,7 +43,9 @@ doCalc <- function(prior, dep, rep, wdir) {
   if (!is(smpls, 'try-error')) {
     smpls[ , ACT := actCNSngl != 1]
     makeNull <- function(x) paste(rep(1, x), collapse = ":")
-    smpls[ , null := sapply(width, makeNull)]
+    null <- data.table(width = 1:5, null = sapply(1:5, makeNull))
+    setkey(null, width)
+    smpls[ , null := null[J(smpls$width), null]]
     smpls[ , PRO := actCN != null]
     res <- smpls[ , .N, by = list(ACT, C1, PRO)]
     setorder(res, -ACT, -C1, -PRO)

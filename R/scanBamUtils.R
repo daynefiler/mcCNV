@@ -18,6 +18,9 @@
   
   tmp <- function(x) {
     x[tags] <- x$tag[tags]
+    n <- length(x[[1]])
+    ind <- sapply(x[tags], is.null)
+    if (n > 0 & any(ind)) x[tags[ind]] <- list(rep(NA, n))
     x$tag <- NULL
     x
   }
@@ -97,6 +100,9 @@ cnvReadBam <- function(bamfile, which, what, tags = NULL, keyby = NULL) {
   s <- scanBam(file = bamfile, index = bamfile, param = p)
   if (!is.null(tags)) s <- .unpackTag(l = s, tags = tags)
   if ("seq" %in% what) s <- .unpackSeq(l = s)
+  if (length(s[[1]][[1]]) == 0) {
+    return(structure(s[[1]], class = c("data.table", "data.frame")))
+  }
   s <- rbindlist(s)
   if (!is.null(keyby)) setkeyv(s, keyby)
   s[]

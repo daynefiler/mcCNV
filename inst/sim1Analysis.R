@@ -44,7 +44,9 @@ doCalc <- function(prior, dep, cw, rep, wdir) {
   if (!is(smpls, 'try-error')) {
     smpls[ , ACT := actCNSngl != 1]
     makeNull <- function(x) paste(rep(1, x), collapse = ":")
-    smpls[ , null := sapply(width, makeNull)]
+    null <- data.table(width = 1:5, null = sapply(1:5, makeNull))
+    setkey(null, width)
+    smpls[ , null := null[J(smpls$width), null]]
     smpls[ , PRO := actCN != null]
     res <- smpls[ , .N, by = list(ACT, C1, PRO)]
     setorder(res, -ACT, -C1, -PRO)

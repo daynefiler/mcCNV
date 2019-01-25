@@ -29,8 +29,8 @@
 #' @importFrom GenomicRanges GRanges
 #' @importFrom GenomeInfoDb seqnames
 #' @importClassesFrom GenomicRanges GRanges
+#' @importFrom Rsamtools scanBamHeader
 #' @export 
-
 
 cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL, 
                          results = TRUE, verbose = FALSE) {
@@ -85,8 +85,13 @@ cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL,
                       keyby = "qname")
     setorder(rds, qname, strand)
     if (verbose) cat("done.\n")
-    cts[[r]] <- .procReads(rds, int[seqnames(int) == r], verbose = verbose)
-    cts[[r]][ , chr := r]
+    if (nrow(rds) == 0) {
+      cts[[r]] <- NULL
+    } else {
+      cts[[r]] <- .procReads(rds, int[seqnames(int) == r], verbose = verbose)
+      set(cts[[r]], j = "chr", value = r)
+    }
+    
   }
   
   cts <- cts[!sapply(cts, is.null)]

@@ -20,7 +20,8 @@ Ns <- 16 ## Number of samples
 if (dir.exists(fdir)) unlink(fdir, recursive = TRUE, force = TRUE)
 dir.create(fdir)
 depDir <- sprintf("d%0.3d/w%0.1d", rep(deps, each = length(cw)), cw)
-sapply(file.path(fdir, depDir), dir.create, recursive = TRUE)
+mkdirs <- sapply(file.path(fdir, depDir), dir.create, recursive = TRUE)
+all(mkdirs)
 
 pars <- expand.grid(Ns = Ns, Ne = Ne, dep = deps, 
                     cw = cw, rep = seq(reps), fdir = fdir)
