@@ -41,7 +41,8 @@ geneMap <- geneMap[J(exon[ , unique(seqnames)])]
 geneMap <- geneMap[chrom != "chrY"]
 exon <- exon[geneMap]
 setorder(exon, chrom, start)
-exon[ , exonName := sprintf("%s:%s", seqnames, LETTERS[1:.N]), by = seqnames]
+L <- c(LETTERS, c(t(outer(LETTERS, LETTERS, paste, sep = ""))))
+exon[ , exonName := sprintf("%s:%s", seqnames, L[1:.N]), by = seqnames]
 erng <- with(exon, GRanges(seqid, IRanges(start, end, names = exonName)))
 
 setkey(bait, chrom)

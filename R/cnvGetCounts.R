@@ -86,15 +86,17 @@ cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL,
     setorder(rds, qname, strand)
     if (verbose) cat("done.\n")
     if (nrow(rds) == 0) {
-      cts[[r]] <- NULL
+      cts[[r]] <- data.table(ref = names(int[seqnames(int) == r]), 
+                             N = 0L,
+                             hang = NA_integer_, 
+                             mult = NA_integer_, 
+                             chr = r)
     } else {
       cts[[r]] <- .procReads(rds, int[seqnames(int) == r], verbose = verbose)
       set(cts[[r]], j = "chr", value = r)
     }
-    
   }
   
-  cts <- cts[!sapply(cts, is.null)]
   cts <- rbindlist(cts)
   cts[ , sbj := sbj]
   
