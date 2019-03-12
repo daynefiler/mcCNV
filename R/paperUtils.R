@@ -53,7 +53,8 @@
     fdep <- mndat[order(fdep)][fwid == i, as.numeric(as.character(fdep))]
     sval <- mndat[order(fdep)][fwid == i, get(stat)]
     SD   <- sddat[order(fdep)][fwid == i, get(stat)]
-    cols <- c(brewer.pal(9, "Blues")[4:8], "darkorange")[i]
+    blues <- tableau_seq_gradient_pal(palette = "Blue")(1:5/5)[i]
+    cols <- c(blues, "#fc7d0b")[i]
     lines(fdep, sval, col = cols, lwd = 2)
     polygon(x = c(fdep, rev(fdep)), 
             y = c(sval + 3*SD, rev(sval - 3*SD)), 
@@ -84,5 +85,9 @@
 }
 
 #-------------------------------------------------------------------------------
+
+.lseq <- function(from, to, length.out) {
+  exp(seq(log(from), log(to), length.out = length.out))
+}
 
 

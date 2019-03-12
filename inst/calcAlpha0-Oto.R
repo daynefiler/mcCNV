@@ -6,40 +6,9 @@ library(data.table)
 library(rslurm)
 library(Rfast)
 
-# cts <- readRDS("realData37/AllSamples.counts")
-# cts[ , proj := dirname(dirname(sbj))]
-# saveRDS(cts[N < 5, list(exonN = .N), by = list(proj, sbj, readN = N)],
-#         file = "realData37/lowCounts.RDS")
-# saveRDS(cts[N > 2000, list(exonN = .N), by = list(proj, sbj)],
-#         file = "realData37/highCounts.RDS")
-# nExonsLow <- cts[N < 5, length(unique(ref))]
-# getUniqueLow <- function(i) {
-#   nExonsLow - cts[N < 5 & sbj != i, length(unique(ref))]
-# }
-# nExonsHigh <- cts[N > 2000, length(unique(ref))]
-# getUniqueHigh <- function(i) {
-#   nExonsHigh - cts[N > 2000 & sbj != i, length(unique(ref))]
-# }
-# unqExonRmLow <- sapply(cts[ , unique(sbj)], getUniqueLow)
-# saveRDS(unqExonRmLow, file = "realData37/uniqueExonLessThan5.RDS")
-# unqExonRmHigh <- sapply(cts[ , unique(sbj)], getUniqueHigh)
-# saveRDS(unqExonRmHigh, file = "realData37/uniqueExonGreaterThan2000.RDS")
-# cts <- cts[!ref %in% cts[N < 5, unique(ref)]]
-# cts[ , p := N/sum(N), by = sbj]
-# cts <- cts[ , list(ref, sbj, proj, p, N)]
-# saveRDS(cts, "realData37/AllAtLeast5.counts")
-## Now remove refs with greater than 2000, but first remove NCG_00211, NCG_00106
-## and NCG_00068 as these samples have much greater coverage than others and 
-## including them would result in the removal of many more exons ~ 500 vs ~2400
-# rmsmpls <- paste0("NCGENES/markdup/NCG_00", c("211", "106", "068"), ".markdup")
-# cts <- cts[!sbj %in% rmsmpls]
-# cts <- cts[!ref %in% cts[N > 2000, unique(ref)]]
-# cts[ , p := N/sum(N), by = sbj]
-# saveRDS(cts, "realData37/AllAtLeast5AndLessThan2000.counts")
-
 getAlpha0 <- function(sbj, fname) {
   
-  its <- 500
+  its <- 2500
   hm <- file.path("/", "projects", "sequence_analysis", "vol5", "dfiler")
   x <- readRDS(file.path(hm, "CNV", "realData37", fname))
   sbs <- unlist(sbj)
@@ -91,21 +60,77 @@ getAlpha0 <- function(sbj, fname) {
   
 }
 
-cts <- readRDS("realData37/AllAtLeast5.counts")
+# cts <- readRDS("realData37/otoAll.counts")
+# cts[ , proj := dirname(dirname(sbj))]
+# saveRDS(cts[N < 5, list(exonN = .N), by = list(proj, sbj, readN = N)],
+#         file = "realData37/otolowCounts.RDS")
+# saveRDS(cts[N > 2000, .N, by = list(proj, sbj)],
+#         file = "realData37/otohighCounts.RDS")
+# ## Using 2 as the low cutoff, due to the decreased number of exons
+# nExonsLow <- cts[N < 2, length(unique(ref))]
+# getUniqueLow <- function(i) {
+#   nExonsLow - cts[N < 2 & sbj != i, length(unique(ref))]
+# }
+# nExonsHigh <- cts[N > 2000, length(unique(ref))]
+# getUniqueHigh <- function(i) {
+#   nExonsHigh - cts[N > 2000 & sbj != i, length(unique(ref))]
+# }
+# unqExonRmLow <- sapply(cts[ , unique(sbj)], getUniqueLow)
+# saveRDS(unqExonRmLow, file = "realData37/otoUniqueExonLessThan5.RDS")
+# unqExonRmHigh <- sapply(cts[ , unique(sbj)], getUniqueHigh)
+# saveRDS(unqExonRmHigh, file = "realData37/uniqueExonGreaterThan2000.RDS")
+# 
+# ## Remove sample otoIC/markdup/C047_B096.markdup due to very low reads and 
+# ## 1126 unique exons with less than 2 reads
+# cts <- cts[sbj != "otoIC/markdup/C047_B096.markdup"]
+# 
+# cts <- cts[!ref %in% cts[N < 2, unique(ref)]]
+# cts[ , p := N/sum(N), by = sbj]
+# cts <- cts[ , list(ref, sbj, proj, p, N)]
+# saveRDS(cts, "realData37/otoAllAtLeast2.counts")
+# cts <- cts[!ref %in% cts[N > 2000, unique(ref)]]
+# cts[ , p := N/sum(N), by = sbj]
+# saveRDS(cts, "realData37/otoAllAtLeast2AndLessThan2000.counts")
+
+cts <- readRDS("realData37/otoAllAtLeast2.counts")
 
 set.seed(5678)
 getSbj <- function(y) cts[proj == y, unique(sbj)]
-ncg <- getSbj("NCGENES")
-pools <- lapply(1:30, function(x) sample(ncg, size = 16))
-pools <- c(pools, lapply(c("Pool1", "Pool2", "SMA"), getSbj))
+ic <- getSbj("otoIC")
+pools <- lapply(1:30, function(x) sample(ic, size = 16))
+pools <- c(pools, lapply(1:30, function(x) sample(ic, size = 12)))
+pools <- c(pools, lapply(cts[proj != "otoIC", unique(proj)], getSbj))
 
-pars <- data.table(sbj = pools, fname = "AllAtLeast5.counts")
+pars <- data.table(sbj = pools, fname = "otoAllAtLeast2.counts")
 
 slurm_apply(f = getAlpha0, 
             params = pars, 
             nodes = nrow(pars),
             cpus_per_node = 1,
-            jobname = "getAlpha0",
+            jobname = "getAlpha0-oto",
+            slurm_options = list(mem = 20000,
+                                 array = sprintf("0-%d", nrow(pars) - 1),
+                                 'cpus-per-task' = 1,
+                                 error =  "%A_%a.err",
+                                 output = "%A_%a.out",
+                                 time = "8-00:00:00"))
+
+cts <- readRDS("realData37/otoAllAtLeast2AndLessThan2000.counts")
+
+set.seed(5678)
+getSbj <- function(y) cts[proj == y, unique(sbj)]
+ic <- getSbj("otoIC")
+pools <- lapply(1:30, function(x) sample(ic, size = 16))
+pools <- c(pools, lapply(1:30, function(x) sample(ic, size = 12)))
+pools <- c(pools, lapply(cts[proj != "otoIC", unique(proj)], getSbj))
+
+pars <- data.table(sbj = pools, fname = "otoAllAtLeast2AndLessThan2000.counts")
+
+slurm_apply(f = getAlpha0, 
+            params = pars, 
+            nodes = nrow(pars),
+            cpus_per_node = 1,
+            jobname = "getAlpha0-oto_new",
             slurm_options = list(mem = 20000,
                                  array = sprintf("0-%d", nrow(pars) - 1),
                                  'cpus-per-task' = 1,
@@ -114,27 +139,8 @@ slurm_apply(f = getAlpha0,
                                  time = "8-00:00:00"))
 
 
-cts <- readRDS("realData37/AllAtLeast5AndLessThan2000.counts")
-
-set.seed(5678)
-getSbj <- function(y) cts[proj == y, unique(sbj)]
-ncg <- getSbj("NCGENES")
-pools <- lapply(1:30, function(x) sample(ncg, size = 16))
-pools <- c(pools, lapply(c("Pool1", "Pool2", "SMA"), getSbj))
-
-pars <- data.table(sbj = pools, fname = "AllAtLeast5AndLessThan2000.counts")
-
-slurm_apply(f = getAlpha0, 
-            params = pars, 
-            nodes = nrow(pars),
-            cpus_per_node = 1,
-            jobname = "getAlpha0_new",
-            slurm_options = list(mem = 20000,
-                                 array = sprintf("0-%d", nrow(pars) - 1),
-                                 'cpus-per-task' = 1,
-                                 error =  "%A_%a.err",
-                                 output = "%A_%a.out",
-                                 time = "8-00:00:00"))
-
-
-
+# library(rslurm)
+# res1 <- get_slurm_out(slurm_job("getAlpha0oto", 74))
+# saveRDS(res1, file = "results_alpha0_oto.RDS")
+# res2 <- get_slurm_out(slurm_job("getAlpha0oto_new", 74))
+# saveRDS(res2, file = "results_alpha0_oto_new.RDS")
