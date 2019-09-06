@@ -4,13 +4,16 @@
 \alias{cnvGatherCounts}
 \title{Gather saved counts into one data.table}
 \usage{
-cnvGatherCounts(input, outfile = NULL, results = TRUE)
+cnvGatherCounts(input, outfile = NULL, results = TRUE, glob = FALSE)
 }
 \arguments{
 \item{input}{Character, directories and/or files to read in}
 
 \item{outfile}{Character of length 1, the file path to write results (.RDS),
 no results written if NULL}
+
+\item{glob}{Logical, should the paths for input counts be expanded using 
+wildcards?}
 }
 \description{
 This help file needs a lot of work

@@ -53,7 +53,7 @@
     fdep <- mndat[order(fdep)][fwid == i, as.numeric(as.character(fdep))]
     sval <- mndat[order(fdep)][fwid == i, get(stat)]
     SD   <- sddat[order(fdep)][fwid == i, get(stat)]
-    blues <- tableau_seq_gradient_pal(palette = "Blue")(1:5/5)[i]
+    blues <- tableau_seq_gradient_pal(palette = "Blue")(1:5/5)
     cols <- c(blues, "#fc7d0b")[i]
     lines(fdep, sval, col = cols, lwd = 2)
     polygon(x = c(fdep, rev(fdep)), 
@@ -61,9 +61,13 @@
             col = .col2alpha(cols, alpha = 0.25), 
             border = NA)
   }
-  axis(side = 1, at = seq(10, 100, by = 10))
+  C <- seq(40, 250, 30)
+  axis(side = 1, at = C*76002546/200E6, labels = paste0(C, "x"), 
+       tcl = -0.8, mgp = c(3, 2, 0), col = "gray50", col.axis = "gray50")
+  axis(side = 1, at = seq(10, 100, by = 10), tcl = -0.4)
   axis(side = 2)
-  mtext("Depth", side = 1, line = 3)
+  mtext("Depth (millions of mapped read pairs; approx. coverage)", 
+        side = 1, line = 4)
   mtext(ylab, side = 2, line = 3)
 }
 
