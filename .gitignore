@@ -40,4 +40,4 @@ src/*.o
 src/*.so
 
 # Junk files
-inst/junk/*
+inst/nobuild/*
