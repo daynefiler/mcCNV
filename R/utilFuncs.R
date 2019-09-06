@@ -68,15 +68,18 @@
 #' Need to add
 #' 
 #' @import data.table
+#' @importFrom tidyr separate
 
 .clpsExon <- function(dat, cw) {
   
+  aw <- -1*(cw - 1)
   setorder(dat, ref)
   shiftby <- if ("chr" %in% names(dat)) c("sbj", "chr") else "sbj"
   dat <- dat[ , 
-              shift(.SD, 1:cw - 1, type = "lead", give.names = TRUE), 
-              by = shiftby]
-  dat[ , N := rowSums(.SD), .SDcols = grep("^N_lead", colnames(dat))]
+              shift(x = .SD, n = 0:aw, type = "shift", give.names = TRUE), 
+              by = shiftby,
+              .SDcols = c("ref", "N")]
+  dat[ , N := rowSums(.SD), .SDcols = grep("^N_shift", colnames(dat))]
   dat[ , 
        ref := do.call(paste, c(.SD, sep = ";")), 
        .SDcols = grep("ref", colnames(dat))]
@@ -85,7 +88,7 @@
          actCN := do.call(paste, c(.SD, sep = ":")), 
          .SDcols = grep("actCN", colnames(dat))]
   }
-  dat[ , grep("_lead_", colnames(dat), value = TRUE) := NULL]
+  dat[ , grep("_shift_", colnames(dat), value = TRUE) := NULL]
   dat <- dat[!is.na(N)]
   dat[ , width := cw]
   dat[]

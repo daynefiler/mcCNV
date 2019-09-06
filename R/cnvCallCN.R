@@ -38,6 +38,13 @@ cnvCallCN <- function(cnts, prior, width = 5, min.dlt = 20, max.its = 30,
             "of refs with >=10 molecule counts.")
   }
   
+  # Depends on specific ref naming and cannot be used
+  # cnts <- separate(data = cnts, 
+  #                  col = "ref", 
+  #                  into = c("chr", "spos", "epos"), 
+  #                  sep = ":|-", 
+  #                  remove = FALSE)
+  
   if (width > 1) {
     widths <- seq(width)
     if (verbose) cat("Collapsing exons...")
