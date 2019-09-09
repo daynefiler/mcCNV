@@ -14,6 +14,10 @@
 #' @param cw integer of length 1, the width (number of exons) the cnv spans
 #' @param seed numeric of length 1, the starting seed for the random number
 #' generator, can be left NULL
+#' @param meanlog numeric of length 1, passed to \code{\link[stats]{rlnorm}}
+#' to define exon capture probabilities
+#' @param sdlog numeric of length 1, passed to \code{\link[stats]{rlnorm}}
+#' to define exon capture probabilities
 #' 
 #' @details 
 #' The number of molecules per sample is drawn from a uniform distribution with
@@ -40,7 +44,8 @@
 #' @import data.table
 #' @export 
 
-cnvGenPool <- function(ns, ne, cw, wndw, pc = NULL, cs = NULL, seed = NULL) {
+cnvGenPool <- function(ns, ne, cw, wndw, pc = NULL, cs = NULL, seed = NULL,
+                       meanlog = -12.36, sdlog = 0.7393) {
   if (!is.null(seed)) set.seed(seed)
   nr <- runif(ns, min = min(wndw), max = max(wndw))
   exonProbs <- rlnorm(ne, -12.36, 0.7393)
