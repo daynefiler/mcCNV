@@ -75,10 +75,12 @@
   aw <- -1*(cw - 1)
   setorder(dat, ref)
   shiftby <- if ("chr" %in% names(dat)) c("sbj", "chr") else "sbj"
+  scols <- c("ref", "N")
+  if ("actCN" %in% names(dat)) scols <- c(scols, "actCN")
   dat <- dat[ , 
               shift(x = .SD, n = 0:aw, type = "shift", give.names = TRUE), 
               by = shiftby,
-              .SDcols = c("ref", "N")]
+              .SDcols = scols]
   dat[ , N := rowSums(.SD), .SDcols = grep("^N_shift", colnames(dat))]
   dat[ , 
        ref := do.call(paste, c(.SD, sep = ";")), 
