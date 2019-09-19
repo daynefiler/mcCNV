@@ -5,15 +5,19 @@
 #' @inheritParams cnvGetCounts
 #' @param glob Logical, should the paths for input counts be expanded using 
 #' wildcards?
+#' @param ... arguments passed to \code{\link[parallel]{mclapply}}
+#' @param cast Logical of length 1, should the data be cast from long to wide 
+#' (i.e. from a single count column to 1 sample per column?)
 #'  
 #' @description This help file needs a lot of work
 #' 
 #' @import data.table
 #' @importFrom utils file_test
+#' @importFrom parallel mclapply
 #' @export
 
 cnvGatherCounts <- function(input, outfile = NULL, results = TRUE, 
-                            glob = FALSE) {
+                            glob = FALSE, cast = FALSE,...) {
   
   ## Check input parameters
   if (is.null(outfile) & !results) {
@@ -28,8 +32,12 @@ cnvGatherCounts <- function(input, outfile = NULL, results = TRUE,
   fls <- c(fls, sapply(drs, list.files, full.names = TRUE))
   fls <- unlist(fls, use.names = FALSE)
   
-  cts <- lapply(fls, readRDS)
+  cts <- mclapply(fls, readRDS, ...)
   cts <- rbindlist(cts)
+  
+  if (cast) {
+    cts <- dcast(cts, ref + chr ~ sbj, value.var = "N")
+  }
   
   ## Write ouputs
   if (!is.null(outfile)) {

@@ -4,7 +4,8 @@
 \alias{cnvGatherCounts}
 \title{Gather saved counts into one data.table}
 \usage{
-cnvGatherCounts(input, outfile = NULL, results = TRUE, glob = FALSE)
+cnvGatherCounts(input, outfile = NULL, results = TRUE, glob = FALSE,
+  cast = FALSE, ...)
 }
 \arguments{
 \item{input}{Character, directories and/or files to read in}
@@ -14,6 +15,11 @@ no results written if NULL}
 
 \item{glob}{Logical, should the paths for input counts be expanded using 
 wildcards?}
+
+\item{cast}{Logical of length 1, should the data be cast from long to wide 
+(i.e. from a single count column to 1 sample per column?)}
+
+\item{...}{arguments passed to \code{\link[parallel]{mclapply}}}
 }
 \description{
 This help file needs a lot of work

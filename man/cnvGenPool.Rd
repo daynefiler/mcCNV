@@ -4,7 +4,8 @@
 \alias{cnvGenPool}
 \title{Generate a simulated pool of samples}
 \usage{
-cnvGenPool(ns, ne, cw, wndw, pc = NULL, cs = NULL, seed = NULL)
+cnvGenPool(ns, ne, cw, wndw, pc = NULL, cs = NULL, seed = NULL,
+  meanlog = -12.36, sdlog = 0.7393)
 }
 \arguments{
 \item{ns}{integer of length 1, the number of samples}
@@ -22,6 +23,12 @@ sample}
 
 \item{seed}{numeric of length 1, the starting seed for the random number
 generator, can be left NULL}
+
+\item{meanlog}{numeric of length 1, passed to \code{\link[stats]{rlnorm}}
+to define exon capture probabilities}
+
+\item{sdlog}{numeric of length 1, passed to \code{\link[stats]{rlnorm}}
+to define exon capture probabilities}
 }
 \description{
 Generate a simulated pool of samples
