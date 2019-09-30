@@ -13,6 +13,7 @@
 
 .calcShrPhi <- function(phi) {
   
+  if (any(is.na(phi))) stop("Error in .calcShrPhi due to missing values.")
   nPhi <- length(phi)
   xi <- seq(0, 1, length.out = 1000)
   asd <- sapply(xi, function(x) 1/sum((phi - x)^2))
@@ -146,10 +147,10 @@
     shrPhi <- cnts[ , 
                     list(n = .N, mn = mn[1], vr = vr[1], isf = sum(1/sf)), 
                     by = list(ref, width)]
-    shrPhi[is.na(vr), vr := mn]
+    # shrPhi[is.na(vr), vr := mn]
     shrPhi[ , phi := (n*vr + mn*isf)/(mn^2*isf), by = ref]
     shrPhi[(phi < 0), phi := 0]
-    if (shrink) shrPhi[ , phi := .calcShrPhi(phi), by = width]
+    if (shrink) shrPhi[!is.na(phi), phi := .calcShrPhi(phi), by = width]
     setkey(cnts, ref)
     setkey(shrPhi, ref)
     cnts <- shrPhi[ , list(ref, phi)][cnts]

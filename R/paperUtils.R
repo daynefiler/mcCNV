@@ -24,7 +24,8 @@
 }
 
 .procRes <- function(x) {
-  if (!"width" %in% names(x)) x[ , width := 1L]
+  if (!"width" %in% names(x)) x[ , width := NA]
+  if (!"dep"   %in% names(x)) x[ ,   dep := NA]
   x[ , fdep := as.factor(dep)]
   x[ , fwid := as.factor(width)]
   x[ , N := as.numeric(N)]

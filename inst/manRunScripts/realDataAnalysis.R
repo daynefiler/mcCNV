@@ -37,14 +37,16 @@ proj <- c(sprintf("otoIC16-%02d", 1:30),
           allFls[!(ind), unique(cap)])
 pars <- data.table(sbj = pools, proj = proj)
 pars[ , wdir := file.path(rdDir, "results")]
+pars[             , prior := 0.060]
+pars[proj == "WGS", prior := 0.006]
 
-runCalc <- function(sbj, proj, wdir) {
+runCalc <- function(sbj, proj, wdir, prior) {
   sbj <- unlist(sbj)
   outFile <- file.path(wdir, sprintf("%s.results", proj))
   kp <- c("ref", "sbj", "N", "mn", "phi", "width", "CN", "lp", "lp1", "vr")
   cts <- cnvGatherCounts(sbj)
   res <- try(cnvCallCN(cnts = cts, 
-                       prior = 0.06, 
+                       prior = prior, 
                        keep.cols = kp, 
                        verbose = TRUE, 
                        outfile = outFile, 
@@ -66,8 +68,35 @@ slurm_apply(f = runCalc,
                                  time = "8-00:00:00"))
 
 
+##----------------------------------------------------------------------------##
+## Aggregate calls for each result
+##----------------------------------------------------------------------------##
 
+library(data.table)
+library(rslurm)
+library(cnvR)
 
+cnvDir <- "/projects/sequence_analysis/vol5/dfiler/CNV"
+resDir <- file.path(cnvDir, "realData37", "results")
+resFls <- data.table(fl = list.files(resDir, full.names = TRUE))
 
+aggRes <- function(fl) {
+  dat <- readRDS(fl)
+  agg <- try(cnvAggCall(dat, width = 5))
+  if (is(agg, "try-error")) return(agg)
+  saveRDS(agg, paste0(fl, ".agg"))
+  TRUE
+}
 
+slurm_apply(f = aggRes, 
+            params = resFls, 
+            nodes = nrow(resFls),
+            cpus_per_node = 1,
+            jobname = "aggRealRes",
+            slurm_options = list(mem = 20000,
+                                 array = sprintf("0-%d", nrow(resFls) - 1),
+                                 'cpus-per-task' = 1,
+                                 error =  "%A_%a.err",
+                                 output = "%A_%a.out",
+                                 time = "8-00:00:00"))
 
