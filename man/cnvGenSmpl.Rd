@@ -4,9 +4,14 @@
 \alias{cnvGenSmpl}
 \title{Generate a simulated sample}
 \usage{
-cnvGenSmpl(nr, pe, cw, seed = NULL, cs = c(0.001, 0.5, 1, 1.5, 2, 2.5,
-  3, 3.5, 4), pc = c(1e-06, 0.000625, 0.998747, 0.000625, 1e-06, 2.5e-07,
-  2.5e-07, 2.5e-07, 2.5e-07))
+cnvGenSmpl(
+  nr,
+  pe,
+  cw,
+  seed = NULL,
+  cs = c(0.001, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4),
+  pc = c(1e-06, 0.000625, 0.998747, 0.000625, 1e-06, 2.5e-07, 2.5e-07, 2.5e-07, 2.5e-07)
+)
 }
 \arguments{
 \item{nr}{integer of length 1, the number of molecules for the sample}

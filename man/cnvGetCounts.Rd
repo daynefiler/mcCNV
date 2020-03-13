@@ -4,8 +4,14 @@
 \alias{cnvGetCounts}
 \title{Given bam and int files, return molecule counts per interval}
 \usage{
-cnvGetCounts(bamfile, int, sbj = NULL, outfile = NULL,
-  results = TRUE, verbose = FALSE)
+cnvGetCounts(
+  bamfile,
+  int,
+  sbj = NULL,
+  outfile = NULL,
+  results = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{bamfile}{Character of length 1, the file path to the .bam file}

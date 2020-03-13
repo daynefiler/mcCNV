@@ -4,8 +4,14 @@
 \alias{cnvGatherCounts}
 \title{Gather saved counts into one data.table}
 \usage{
-cnvGatherCounts(input, outfile = NULL, results = TRUE, glob = FALSE,
-  cast = FALSE, ...)
+cnvGatherCounts(
+  input,
+  outfile = NULL,
+  results = TRUE,
+  glob = FALSE,
+  cast = FALSE,
+  ...
+)
 }
 \arguments{
 \item{input}{Character, directories and/or files to read in}

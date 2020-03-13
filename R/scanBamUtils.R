@@ -174,8 +174,14 @@ cnvInt2GRange <- function(intfile, pad = NULL, skip = 0) {
 #' @param intfile Character of length 1, the file path to the .interval file
 #' @param pad Integer of length 1, the number of basepairs to pad around the 
 #' bed file intervals
+#' @param skip Integer of length 1, the number of lines to skip when reading
+#' the BED file, passed to [data.table::fread]. 
+#' @param adj Logical of length 1, when TRUE adjust the start positions by 
+#' adding 1 to convert 0-based BED coordinates to 1-based
 #' 
-#' @note 
+#' @note BED files have 0-based coordinates, and this function defaults to 
+#' adding 1 to all start positions. See this 
+#' [Biostars post](https://www.biostars.org/p/84686/) for more information.
 #' 
 #' @return GRanges object with reference intervals
 #' 
@@ -186,16 +192,17 @@ cnvInt2GRange <- function(intfile, pad = NULL, skip = 0) {
 #' @importClassesFrom GenomicRanges GRanges
 #' @export 
 
-cnvBed2GRange <- function(bedfile, pad = NULL, skip = 0) {
+cnvBed2GRange <- function(bedfile, pad = NULL, skip = 0, adj = TRUE) {
   int <- fread(bedfile, skip = skip)
-  if (!is.null(int[[4]])) {
+  if (ncol(int) > 3) {
     nms <- int[[4]]
-    setNames <- TRUE
+    hasNames <- TRUE
   } else {
-    setNames <- FALSE
+    hasNames <- FALSE
   }
-  int <- GRanges(seqnames = int[[1]], IRanges(start = int[[2]], end = int[[3]]))
-  if (setNames) {
+  int <- GRanges(seqnames = int[[1]], 
+                 IRanges(start = int[[2]] + 1, end = int[[3]]))
+  if (hasNames) {
     names(int) <- nms
   } else {
     names(int) <- paste(seqnames(int), ranges(int), sep = ":")

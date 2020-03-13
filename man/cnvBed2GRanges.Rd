@@ -5,11 +5,17 @@
 \alias{cnvBed2GRange}
 \title{Read in .bed file to GRanges.}
 \usage{
-cnvBed2GRange(bedfile, pad = NULL, skip = 0)
+cnvBed2GRange(bedfile, pad = NULL, skip = 0, adj = TRUE)
 }
 \arguments{
 \item{pad}{Integer of length 1, the number of basepairs to pad around the 
 bed file intervals}
+
+\item{skip}{Integer of length 1, the number of lines to skip when reading
+the BED file, passed to [data.table::fread].}
+
+\item{adj}{Logical of length 1, when TRUE adjust the start positions by 
+adding 1 to convert 0-based BED coordinates to 1-based}
 
 \item{intfile}{Character of length 1, the file path to the .interval file}
 }
@@ -21,5 +27,7 @@ GRanges object with reference intervals
 returns a GRanges object for the intervals in the file.
 }
 \note{
-
+BED files have 0-based coordinates, and this function defaults to 
+adding 1 to all start positions. See this 
+[Biostars post](https://www.biostars.org/p/84686/) for more information.
 }

@@ -17,6 +17,8 @@ dir.create(resDir)
 countDirs <- Sys.glob(file.path(rdDir, "*", "counts"))
 allFls <- data.table(path = list.files(countDirs, full.names = TRUE))
 allFls[ , cap := gsub(paste0(rdDir, "|/|counts.+$"), "", path)]
+## Do not include IDT-IC in 'ind' even though independently captured. Here, the 
+## 'ind' flag is really used for sampling pools and we only have 16 samples.
 allFls[ , ind := cap %in% c("otoIC", "NCGENES")]
 ## Exclude C047_B096 due to very low reads
 allFls <- allFls[!grepl("C047_B096", path)]
@@ -38,7 +40,7 @@ proj <- c(sprintf("otoIC16-%02d", 1:30),
 pars <- data.table(sbj = pools, proj = proj)
 pars[ , wdir := file.path(rdDir, "results")]
 pars[             , prior := 0.060]
-pars[proj == "WGS", prior := 0.006]
+pars[grepl("WGS|IDT", proj), prior := 0.006]
 
 runCalc <- function(sbj, proj, wdir, prior) {
   sbj <- unlist(sbj)
@@ -78,7 +80,8 @@ library(cnvR)
 
 cnvDir <- "/projects/sequence_analysis/vol5/dfiler/CNV"
 resDir <- file.path(cnvDir, "realData37", "results")
-resFls <- data.table(fl = list.files(resDir, full.names = TRUE))
+resFls <- list.files(resDir, full.names = TRUE, pattern = ".results$")
+resFls <- data.table(fl = resFls)
 
 aggRes <- function(fl) {
   dat <- readRDS(fl)

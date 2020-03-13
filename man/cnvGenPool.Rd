@@ -4,8 +4,17 @@
 \alias{cnvGenPool}
 \title{Generate a simulated pool of samples}
 \usage{
-cnvGenPool(ns, ne, cw, wndw, pc = NULL, cs = NULL, seed = NULL,
-  meanlog = -12.36, sdlog = 0.7393)
+cnvGenPool(
+  ns,
+  ne,
+  cw,
+  wndw,
+  pc = NULL,
+  cs = NULL,
+  seed = NULL,
+  meanlog = -12.36,
+  sdlog = 0.7393
+)
 }
 \arguments{
 \item{ns}{integer of length 1, the number of samples}

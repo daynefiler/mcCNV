@@ -4,9 +4,19 @@
 \alias{cnvCallCN}
 \title{Call copy number-state for the given data}
 \usage{
-cnvCallCN(cnts, prior, width = 5, min.dlt = 20, max.its = 30,
-  outfile = NULL, agg = FALSE, shrink = TRUE, keep.cols = NULL,
-  verbose = FALSE, return.res = TRUE)
+cnvCallCN(
+  cnts,
+  prior,
+  width = 5,
+  min.dlt = 20,
+  max.its = 30,
+  outfile = NULL,
+  agg = FALSE,
+  shrink = TRUE,
+  keep.cols = NULL,
+  verbose = FALSE,
+  return.res = TRUE
+)
 }
 \arguments{
 \item{cnts}{the input data, see details}

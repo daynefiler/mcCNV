@@ -10,4 +10,4 @@ Description: To be added.
 Encoding: UTF-8
 LazyData: true
 Imports: Rsamtools
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
