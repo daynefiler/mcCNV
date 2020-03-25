@@ -80,23 +80,31 @@
 #' and processes the list result into a data.table. 
 #' 
 #' @param bamfile Character of length 1, the file path to the .bam file
-#' @param which IRanges object, the range of sequences to load, passed to 
-#' Rsamtools:ScanBamParam 'which' parameter
+#' @param which IRangesList or GRanges object, the range of sequences to load, 
+#' passed to [Rsamtools::ScanBamParam] 'which' parameter
 #' @param what Character, the fields to extract from the bam file, passed to 
-#' Rsamtools:ScanBamParam 'what' parameter
+#' [Rsamtools::ScanBamParam] 'what' parameter
 #' @param tags Character, the tag fields to extract from the bam file, passed to 
-#' Rsamtools:ScanBamParam 'tags' parameter
+#' [Rsamtools::ScanBamParam] 'tags' parameter
 #' @param keyby Character, the field to key the data.table by
 #' 
 #' @return data.table object with specified fields & tags extracted from 
 #' .bam file
 #' 
+#' @TODO Need to figure out some of the issues with tags, and users giving
+#' more than one range to which
+#' 
 #' @importFrom Rsamtools ScanBamParam scanBam
 #' @export 
 
-cnvReadBam <- function(bamfile, which, what, tags = NULL, keyby = NULL) {
+cnvReadBam <- function(bamfile, 
+                       which = IRangesList(), 
+                       what = scanBamWhat(), 
+                       tags = NULL, 
+                       keyby = NULL) {
   
-  p <- ScanBamParam(which = which, what = what, tag = tags)
+  p <- ScanBamParam(which = which, what = what)
+  if (!is.null(tags)) bamTag(p) <- tags
   s <- scanBam(file = bamfile, index = bamfile, param = p)
   if (!is.null(tags)) s <- .unpackTag(l = s, tags = tags)
   if ("seq" %in% what) s <- .unpackSeq(l = s)
@@ -160,7 +168,7 @@ cnvReadRefs <- function(bamfile) {
 cnvInt2GRange <- function(intfile, pad = NULL, skip = 0) {
   int <- fread(intfile, header = FALSE, sep = "\t", skip = skip)[[1]]
   int <- GRanges(int)
-  if (!is.null(pad)) int <- .padGRanges(int)
+  if (!is.null(pad)) int <- .padGRanges(int, pad)
   names(int) <- paste(seqnames(int), ranges(int), sep = ":")
   int
 }
@@ -207,7 +215,7 @@ cnvBed2GRange <- function(bedfile, pad = NULL, skip = 0, adj = TRUE) {
   } else {
     names(int) <- paste(seqnames(int), ranges(int), sep = ":")
   }
-  if (!is.null(pad)) int <- .padGRanges(int)
+  if (!is.null(pad)) int <- .padGRanges(int, pad)
   int
 }
 
