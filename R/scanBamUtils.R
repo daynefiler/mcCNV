@@ -94,7 +94,7 @@
 #' @TODO Need to figure out some of the issues with tags, and users giving
 #' more than one range to which
 #' 
-#' @importFrom Rsamtools ScanBamParam scanBam
+#' @importFrom Rsamtools ScanBamParam scanBam bamTag<- 
 #' @export 
 
 cnvReadBam <- function(bamfile, 

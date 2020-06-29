@@ -9,5 +9,6 @@ Maintainer: Dayne Filer <dayne.filer@gmail.com>
 Description: To be added. 
 Encoding: UTF-8
 LazyData: true
-Imports: Rsamtools
-RoxygenNote: 7.0.2
+Imports: Rsamtools, dlfUtils, S4Vectors, matrixStats, GenomicRanges, IRanges,
+    Rfast, parallel, stats, IRanges, GenomeInfoDb, utils, data.table
+RoxygenNote: 7.1.0

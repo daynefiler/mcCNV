@@ -69,7 +69,6 @@
 #' Need to add
 #' 
 #' @import data.table
-#' @importFrom tidyr separate
 
 .clpsExon <- function(dat, cw) {
   

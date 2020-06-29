@@ -4,19 +4,25 @@
 \alias{cnvReadBam}
 \title{Wrapper to Rsamtools:scanBam to load .bam file as a data.table object}
 \usage{
-cnvReadBam(bamfile, which, what, tags = NULL, keyby = NULL)
+cnvReadBam(
+  bamfile,
+  which = IRangesList(),
+  what = scanBamWhat(),
+  tags = NULL,
+  keyby = NULL
+)
 }
 \arguments{
 \item{bamfile}{Character of length 1, the file path to the .bam file}
 
-\item{which}{IRanges object, the range of sequences to load, passed to 
-Rsamtools:ScanBamParam 'which' parameter}
+\item{which}{IRangesList or GRanges object, the range of sequences to load, 
+passed to [Rsamtools::ScanBamParam] 'which' parameter}
 
 \item{what}{Character, the fields to extract from the bam file, passed to 
-Rsamtools:ScanBamParam 'what' parameter}
+[Rsamtools::ScanBamParam] 'what' parameter}
 
 \item{tags}{Character, the tag fields to extract from the bam file, passed to 
-Rsamtools:ScanBamParam 'tags' parameter}
+[Rsamtools::ScanBamParam] 'tags' parameter}
 
 \item{keyby}{Character, the field to key the data.table by}
 }

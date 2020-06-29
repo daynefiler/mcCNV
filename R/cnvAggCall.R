@@ -15,19 +15,13 @@
 #' called a CNV
 #' 
 #' @import data.table
-#' @importFrom tidyr separate 
 #' @export
 
 cnvAggCall <- function(dat, width = 5) {
   
   cols <- paste0("r", seq(width))
-  dat <- separate(dat, 
-                  col = "ref", 
-                  into = cols, 
-                  sep = ";", 
-                  fill = "right", 
-                  remove = FALSE)
-  gc()
+  dat[ , (cols) := tstrsplit(ref, split = ";", names = FALSE)]
+  dat[ , ref := NULL]
   
   ind <- lapply(cols, function(x) dat[ , which(!is.na(get(x)))])
   dat <- dat[unlist(ind)]
