@@ -44,6 +44,10 @@ cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL,
   if (missing(bamfile)) stop("Must provide 'bamfile'; see ?cnvGetCounts.")
   if (missing(int)) stop("Must provide 'int'; see ?cnvGetCounts.")
   
+  if (is.null(names(int)) || anyduplicated(names(int))) {
+    stop("names(int) must be defined & unique.")
+  }
+  
   if (is.character(bamfile) & length(bamfile) == 1) {
     if (!file.exists(bamfile)) {
       stop("Given 'bamfile' does not exist.")
@@ -89,18 +93,20 @@ cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL,
       cts[[r]] <- data.table(ref = names(int[seqnames(int) == r]), 
                              N = 0L,
                              hang = NA_integer_, 
-                             mult = NA_integer_, 
-                             chr = r)
+                             mult = NA_integer_)
     } else {
       cts[[r]] <- .procReads(rds, int[seqnames(int) == r], verbose = verbose)
       set(cts[[r]], j = "chr", value = r)
     }
   }
   
+  tmp <- data.table(ref = names(int), as.data.table(int))
+  
   cts <- rbindlist(cts)
   cts[ , sbj := sbj]
+  cts <- merge(cts, tmp[ , .(ref, chr = seqnames, spos = start)], by = "ref")
   
-  ## Write ouputs
+  ## Write outputs
   if (!is.null(outfile)) {
     if (verbose) cat("Writing output file...")
     saveRDS(cts, file = outfile)

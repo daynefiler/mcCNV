@@ -72,8 +72,12 @@
 
 .clpsExon <- function(dat, cw) {
   
-  setorder(dat, ref)
   if (cw > 1) {
+    
+    ## Set the order based on the chromosome & start position, or the ref 
+    ## column if chr and spos not given (helpful for simulated data)
+    setorderv(dat, intersect(c("chr", "spos", "ref"), names(dat)))
+    
     aw <- -1*(cw - 1)
     shiftby <- if ("chr" %in% names(dat)) c("sbj", "chr") else "sbj"
     scols <- c("ref", "N")
