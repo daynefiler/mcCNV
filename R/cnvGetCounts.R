@@ -96,7 +96,6 @@ cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL,
                              mult = NA_integer_)
     } else {
       cts[[r]] <- .procReads(rds, int[seqnames(int) == r], verbose = verbose)
-      set(cts[[r]], j = "chr", value = r)
     }
   }
   
