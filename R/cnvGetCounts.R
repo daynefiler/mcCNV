@@ -44,7 +44,7 @@ cnvGetCounts <- function(bamfile, int, sbj = NULL, outfile = NULL,
   if (missing(bamfile)) stop("Must provide 'bamfile'; see ?cnvGetCounts.")
   if (missing(int)) stop("Must provide 'int'; see ?cnvGetCounts.")
   
-  if (is.null(names(int)) || anyduplicated(names(int))) {
+  if (is.null(names(int)) || any(duplicated(names(int)))) {
     stop("names(int) must be defined & unique.")
   }
   
