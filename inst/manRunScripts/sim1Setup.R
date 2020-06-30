@@ -2,7 +2,7 @@
 ## Script to create the simulated dataset uniform CNV sizes
 ##----------------------------------------------------------------------------##
 
-library(cnvR)
+library(mcCNV)
 library(rslurm)
 library(data.table)
 

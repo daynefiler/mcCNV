@@ -2,7 +2,7 @@
 ## Script to do the prior selection analysis -- take 2
 ##----------------------------------------------------------------------------##
 
-library(cnvR)
+library(mcCNV)
 library(rslurm)
 library(data.table)
 

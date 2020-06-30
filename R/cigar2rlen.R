@@ -1,6 +1,6 @@
 #' @title Convert cigar string to length
 #' @description Converts cigar string to length
-#' @useDynLib cnvR, .registration = TRUE, .fixes = "C_"
+#' @useDynLib mcCNV, .registration = TRUE, .fixes = "C_"
 #' @export
 
 cigar2rlen <- function(x) {

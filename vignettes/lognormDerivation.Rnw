@@ -10,7 +10,7 @@ When simulating a ``genome'' the probability of an exon being captured is drawn 
 
 <<fig=TRUE>>=
 library(data.table)
-library(cnvR)
+library(mcCNV)
 library(MASS)
 data(real16) 
 ## Calculate the median counts (across samples) per exon

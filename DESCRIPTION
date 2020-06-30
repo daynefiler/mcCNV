@@ -1,4 +1,4 @@
-Package: cnvR
+Package: mcCNV
 Type: Package
 Title: Call copy number variants from whole exome/whole genome sequencing data
 Version: 0.1.0

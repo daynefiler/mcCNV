@@ -4,7 +4,7 @@
 
 library(data.table)
 library(rslurm)
-library(cnvR)
+library(mcCNV)
 
 cnvDir <- "/projects/sequence_analysis/vol5/dfiler/CNV"
 jbnm <- "realDataAnalysis"
@@ -76,7 +76,7 @@ slurm_apply(f = runCalc,
 
 library(data.table)
 library(rslurm)
-library(cnvR)
+library(mcCNV)
 
 cnvDir <- "/projects/sequence_analysis/vol5/dfiler/CNV"
 resDir <- file.path(cnvDir, "realData37", "results")

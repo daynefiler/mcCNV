@@ -28,7 +28,7 @@
 #' distribution, where each exon has its own probability. The multinomial 
 #' distribution is given by drawing from a log-normal 
 #' distribution with mean -12.36 and sd 0.7393. See 
-#' \code{vignette("lognormDerivation", "cnvR")} for more information.
+#' \code{vignette("lognormDerivation", "mcCNV")} for more information.
 #' 
 #' `cs`, `pc`, `cw` are all passed to \code{\link{cnvGenSmpl}}. Leaving `cs` &
 #' `pc` NULL will use the default values. 

@@ -4,7 +4,7 @@
 
 library(data.table)
 library(rslurm)
-library(cnvR)
+library(mcCNV)
 library(tidyr)
 library(dlfUtils)
 

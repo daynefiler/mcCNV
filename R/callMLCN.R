@@ -1,6 +1,6 @@
 #' @title temp
 #' @description temp
-#' @useDynLib cnvR, .registration = TRUE, .fixes = "C_"
+#' @useDynLib mcCNV, .registration = TRUE, .fixes = "C_"
 #' @export
 
 callMLCN <- function(N, mu, sf, phi, prior) {

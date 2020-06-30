@@ -2,7 +2,7 @@
 ## Script to do the analysis on the whole simulation 2 at prior of 0.03
 ##----------------------------------------------------------------------------##
 
-library(cnvR)
+library(mcCNV)
 library(rslurm)
 library(data.table)
 
