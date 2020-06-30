@@ -9,8 +9,8 @@ cnvAggCall(dat, width = 5)
 \arguments{
 \item{dat}{the input data, see details}
 
-\item{width}{integer of length 1, the maximum width (number of consecutive
-exons) to evaluate simultaneously}
+\item{width}{integer, window of contiguous exons to calculate CN on; can 
+provide a vector with multiple widths}
 }
 \description{
 Aggregate CN-state calls from different widths to single call

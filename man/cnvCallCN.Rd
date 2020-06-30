@@ -7,7 +7,7 @@
 cnvCallCN(
   cnts,
   prior,
-  width = 5,
+  width = 1:5,
   min.dlt = 20,
   max.its = 30,
   outfile = NULL,
@@ -23,8 +23,8 @@ cnvCallCN(
 
 \item{prior}{numeric of length 1, the prior probability of having a CNV}
 
-\item{width}{integer of length 1, the maximum width (number of consecutive
-exons) to evaluate simultaneously}
+\item{width}{integer, window of contiguous exons to calculate CN on; can 
+provide a vector with multiple widths}
 
 \item{min.dlt}{integer of length 1, the target number of changes in copy-
 state to stop the alogorithm}

@@ -50,7 +50,7 @@ doCalc <- function(prior, dep, cw, rep, wdir) {
                          agg = TRUE, 
                          shrink = TRUE,
                          keep.cols = kp, 
-                         width = 5,
+                         width = 1:5,
                          verbose = TRUE))
   if (!is(smpls, 'try-error')) {
     smpls[ , ACT := actCNSngl != 1]

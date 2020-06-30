@@ -6,8 +6,8 @@
 #' @title Call copy number-state for the given data
 #' 
 #' @param cnts the input data, see details
-#' @param width integer of length 1, the maximum width (number of consecutive
-#' exons) to evaluate simultaneously
+#' @param width integer, window of contiguous exons to calculate CN on; can 
+#' provide a vector with multiple widths
 #' @param outfile character of length 1, when not NULL, save .RDS file to the
 #' file given
 #' @inheritParams callCN
@@ -18,7 +18,7 @@
 #' @import data.table
 #' @export
 
-cnvCallCN <- function(cnts, prior, width = 5, min.dlt = 20, max.its = 30, 
+cnvCallCN <- function(cnts, prior, width = 1:5, min.dlt = 20, max.its = 30, 
                       outfile = NULL, agg = FALSE, shrink = TRUE,
                       keep.cols = NULL, verbose = FALSE,
                       return.res = TRUE) {
@@ -38,14 +38,9 @@ cnvCallCN <- function(cnts, prior, width = 5, min.dlt = 20, max.its = 30,
             "of refs with >=10 molecule counts.")
   }
   
-  if (width > 1) {
-    widths <- seq(width)
-    if (verbose) cat("Collapsing exons...")
-    cnts <- rbindlist(lapply(widths, .clpsExon, dat = cnts))
-    if (verbose) cat("done.\n")
-  } else {
-    cnts[ , width := 1]
-  }
+  if (verbose) cat("Collapsing exons...")
+  cnts <- rbindlist(lapply(widths, .clpsExon, dat = cnts))
+  if (verbose) cat("done.\n")
   
   if (verbose) cat("Calling CNVs...")
   cnts <- .callCN(cnts = cnts, 
