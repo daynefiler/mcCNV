@@ -72,32 +72,29 @@
 
 .clpsExon <- function(dat, cw) {
   
-  if (cw > 1) {
-    
-    ## Set the order based on the chromosome & start position, or the ref 
-    ## column if chr and spos not given (helpful for simulated data)
-    setorderv(dat, intersect(c("chr", "spos", "ref"), names(dat)))
-    
-    aw <- -1*(cw - 1)
-    shiftby <- if ("chr" %in% names(dat)) c("sbj", "chr") else "sbj"
-    scols <- c("ref", "N")
-    if ("actCN" %in% names(dat)) scols <- c(scols, "actCN")
-    dat <- dat[ , 
-                shift(x = .SD, n = 0:aw, type = "shift", give.names = TRUE), 
-                by = shiftby,
-                .SDcols = scols]
-    dat[ , N := rowSums(.SD), .SDcols = grep("^N_shift", colnames(dat))]
-    dat[ , 
-         ref := do.call(paste, c(.SD, sep = ";")), 
-         .SDcols = grep("ref", colnames(dat))]
-    if (any(grepl("actCN", colnames(dat)))) {
-      dat[ ,
-           actCN := do.call(paste, c(.SD, sep = ":")), 
-           .SDcols = grep("actCN", colnames(dat))]
-    }
-    dat[ , grep("_shift_", colnames(dat), value = TRUE) := NULL]
-    dat <- dat[!is.na(N)]
+  ## Set the order based on the chromosome & start position, or the ref 
+  ## column if chr and spos not given (helpful for simulated data)
+  setorderv(dat, intersect(c("chr", "spos", "ref"), names(dat)))
+  
+  aw <- -1*(cw - 1)
+  shiftby <- if ("chr" %in% names(dat)) c("sbj", "chr") else "sbj"
+  scols <- c("ref", "N")
+  if ("actCN" %in% names(dat)) scols <- c(scols, "actCN")
+  dat <- dat[ , 
+              data.table::shift(x = .SD, n = 0:aw, type = "shift", give.names = TRUE), 
+              by = shiftby,
+              .SDcols = scols]
+  dat[ , N := rowSums(.SD), .SDcols = grep("^N_shift", colnames(dat))]
+  dat[ , 
+       ref := do.call(paste, c(.SD, sep = ";")), 
+       .SDcols = grep("ref", colnames(dat))]
+  if (any(grepl("actCN", colnames(dat)))) {
+    dat[ ,
+         actCN := do.call(paste, c(.SD, sep = ":")), 
+         .SDcols = grep("actCN", colnames(dat))]
   }
+  dat[ , grep("_shift_", colnames(dat), value = TRUE) := NULL]
+  dat <- dat[!is.na(N)]
   dat[ , width := cw]
   dat[]
   
