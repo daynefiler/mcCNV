@@ -39,7 +39,7 @@ cnvCallCN <- function(cnts, prior, width = 1:5, min.dlt = 20, max.its = 30,
   }
   
   if (verbose) cat("Collapsing exons...")
-  cnts <- rbindlist(lapply(widths, .clpsExon, dat = cnts))
+  cnts <- rbindlist(lapply(width, .clpsExon, dat = cnts))
   if (verbose) cat("done.\n")
   
   if (verbose) cat("Calling CNVs...")
