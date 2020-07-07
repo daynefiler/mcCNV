@@ -16,13 +16,10 @@ cnvGatherCounts(
 \arguments{
 \item{input}{Character, directories and/or files to read in}
 
-\item{outfile}{Character of length 1, the file path to write results (.RDS),
-no results written if NULL}
-
-\item{glob}{Logical, should the paths for input counts be expanded using 
+\item{glob}{Logical, should the paths for input counts be expanded using
 wildcards?}
 
-\item{cast}{Logical of length 1, should the data be cast from long to wide 
+\item{cast}{Logical of length 1, should the data be cast from long to wide
 (i.e. from a single count column to 1 sample per column?)}
 
 \item{...}{arguments passed to \code{\link[parallel]{mclapply}}}

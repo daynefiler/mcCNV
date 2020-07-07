@@ -23,7 +23,7 @@ cnvCallCN(
 
 \item{prior}{numeric of length 1, the prior probability of having a CNV}
 
-\item{width}{integer, window of contiguous exons to calculate CN on; can 
+\item{width}{integer, window of contiguous exons to calculate CN on; can
 provide a vector with multiple widths}
 
 \item{min.dlt}{integer of length 1, the target number of changes in copy-

@@ -1,5 +1,3 @@
-#' @title temp
-#' @description temp
 #' @useDynLib mcCNV, .registration = TRUE, .fixes = "C_"
 #' @export
 

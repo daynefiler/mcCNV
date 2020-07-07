@@ -2,40 +2,29 @@
 % Please edit documentation in R/cnvGetCounts.R
 \name{cnvGetCounts}
 \alias{cnvGetCounts}
-\title{Given bam and int files, return molecule counts per interval}
+\title{Count molecules from a bam file overlapping given intervals}
 \usage{
-cnvGetCounts(
-  bamfile,
-  int,
-  sbj = NULL,
-  outfile = NULL,
-  results = TRUE,
-  verbose = FALSE
-)
+cnvGetCounts(bamfile, int, sbj = NULL, verbose = TRUE)
 }
 \arguments{
 \item{bamfile}{Character of length 1, the file path to the .bam file}
 
-\item{int}{GRanges object containing the intervals (exons) to count reads
-into}
+\item{int}{data.table object containing the intervals to count
+molecules over; see \code{?cnvValidInterval}}
 
-\item{sbj}{Character or numeric of length 1, the subject name for bam file; 
-defaults to the input filename when NULL}
+\item{sbj}{Character of length 1, the subject name for bam file;
+defaults to 'bamfile' parameter when NULL}
 
-\item{outfile}{Character of length 1, the file path to write results (.RDS),
-no results written if NULL}
-
-\item{verbose}{TRUE/FALSE, if TRUE progress messages will be sent to the 
-console}
-
-\item{return}{TRUE/FALSE, should the results be returned to the console?
-Should not be FALSE if outfile is NULL}
+\item{verbose}{TRUE/FALSE}
 }
 \value{
-data.table object with counts for the intervals given in int
+data.table \link[=validObjects]{counts object}
 }
 \description{
-\code{cnvGetCounts} takes a bam file and an interval file and
-returns the overlapping molecules for each interval in the interval file 
-that span a given reference sequence.
+\code{cnvGetCounts} takes a bam file and an
+\link[=validObjects]{interval object} and returns the number of
+overlapping molecules for each of the given intervals
+}
+\details{
+
 }

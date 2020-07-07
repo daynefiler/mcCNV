@@ -44,20 +44,20 @@ Generate a simulated pool of samples
 }
 \details{
 The number of molecules per sample is drawn from a uniform distribution with
-the bounds given by `wndw`.
+the bounds given by \code{wndw}.
 
-For each pool a psuedo genome is created by modeling the probability of 
-an exon receving a molecule during the capture process as a multinomial 
-distribution, where each exon has its own probability. The multinomial 
-distribution is given by drawing from a log-normal 
-distribution with mean -12.36 and sd 0.7393. See 
+For each pool a psuedo genome is created by modeling the probability of
+an exon receving a molecule during the capture process as a multinomial
+distribution, where each exon has its own probability. The multinomial
+distribution is given by drawing from a log-normal
+distribution with mean -12.36 and sd 0.7393. See
 \code{vignette("lognormDerivation", "mcCNV")} for more information.
 
-`cs`, `pc`, `cw` are all passed to \code{\link{cnvGenSmpl}}. Leaving `cs` &
-`pc` NULL will use the default values. 
+\code{cs}, \code{pc}, \code{cw} are all passed to \code{\link{cnvGenSmpl}}. Leaving \code{cs} &
+\code{pc} NULL will use the default values.
 
-`seed` sets the seed for defining the multinomial distribution of 
-probabilites that each exon gets a molecule. 
+\code{seed} sets the seed for defining the multinomial distribution of
+probabilites that each exon gets a molecule.
 
 The number of reads per sample is passed as the seed to
 \code{cnvGenSmpl}. This allows the simulated datasets to be completely

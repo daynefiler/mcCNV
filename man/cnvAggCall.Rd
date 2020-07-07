@@ -9,7 +9,7 @@ cnvAggCall(dat, width = 5)
 \arguments{
 \item{dat}{the input data, see details}
 
-\item{width}{integer, window of contiguous exons to calculate CN on; can 
+\item{width}{integer, window of contiguous exons to calculate CN on; can
 provide a vector with multiple widths}
 }
 \description{

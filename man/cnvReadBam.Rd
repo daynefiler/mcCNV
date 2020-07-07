@@ -6,8 +6,9 @@
 \usage{
 cnvReadBam(
   bamfile,
-  which = IRangesList(),
+  which,
   what = scanBamWhat(),
+  flag = scanBamFlag(),
   tags = NULL,
   keyby = NULL
 )
@@ -15,19 +16,20 @@ cnvReadBam(
 \arguments{
 \item{bamfile}{Character of length 1, the file path to the .bam file}
 
-\item{which}{IRangesList or GRanges object, the range of sequences to load, 
-passed to [Rsamtools::ScanBamParam] 'which' parameter}
+\item{which}{IRangesList or GRanges object, the range of sequences to load,
+passed to \link[Rsamtools:ScanBamParam]{Rsamtools::ScanBamParam} 'which' parameter; loads all sequences
+when omitted}
 
-\item{what}{Character, the fields to extract from the bam file, passed to 
-[Rsamtools::ScanBamParam] 'what' parameter}
+\item{what}{Character, the fields to extract from the bam file, passed to
+\link[Rsamtools:ScanBamParam]{Rsamtools::ScanBamParam} 'what' parameter}
 
-\item{tags}{Character, the tag fields to extract from the bam file, passed to 
-[Rsamtools::ScanBamParam] 'tags' parameter}
+\item{tags}{Character, the tag fields to extract from the bam file, passed to
+\link[Rsamtools:ScanBamParam]{Rsamtools::ScanBamParam} 'tags' parameter}
 
 \item{keyby}{Character, the field to key the data.table by}
 }
 \value{
-data.table object with specified fields & tags extracted from 
+data.table object with specified fields & tags extracted from
 .bam file
 }
 \description{

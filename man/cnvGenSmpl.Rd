@@ -32,10 +32,10 @@ generator, can be left NULL}
 Generate a simulated sample
 }
 \details{
-`pe` essentiall provides the "genome" and needs to be consistent across
-samples that will be compared. 
+\code{pe} essentiall provides the "genome" and needs to be consistent across
+samples that will be compared.
 
-`cs` and `pc` must be the same length. The possible copy states assume the 
+\code{cs} and \code{pc} must be the same length. The possible copy states assume the
 normal copy state (2 copies) is 1. Likewise, a single copy of an exon would
 be denoted as 0.5. The values we suggest for the possible states and their
 priors are given as the default values.

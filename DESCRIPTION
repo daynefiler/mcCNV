@@ -12,3 +12,4 @@ LazyData: true
 Imports: Rsamtools, dlfUtils, S4Vectors, matrixStats, GenomicRanges, IRanges,
     Rfast, parallel, stats, IRanges, GenomeInfoDb, utils, data.table
 RoxygenNote: 7.1.0
+Roxygen: list(markdown = TRUE)

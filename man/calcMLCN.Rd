@@ -19,7 +19,7 @@
 \item{prior}{numeric of length 1, the prior probabilty of having a CNV}
 }
 \value{
-list, first element gives the most likely copy number-state and 
+list, first element gives the most likely copy number-state and
 the second element gives the likelihood value
 }
 \description{

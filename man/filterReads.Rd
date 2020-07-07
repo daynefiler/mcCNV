@@ -11,7 +11,7 @@
 \item{x}{data.table object to be modified by reference}
 }
 \description{
-\code{cnvFilterReads} modifies the given data.table object, 
+\code{cnvFilterReads} modifies the given data.table object,
 adding the 'ff' ("filter flag") field, specifying which reads to remove
 from furhter analysis.
 }
