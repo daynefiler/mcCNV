@@ -11,9 +11,15 @@ NULL
 #' @section Interval objects:
 #' Interval objects define the intervals for computing copy number; inspired
 #' by the GenomicRanges package, they require 'seqnames', 'start', and 'end'.
-#' Additionally, the start and end fields must be integers and all end values
-#' must be greater than all start values. Converting a 
-#' [GRanges][GenomicRanges::GRanges] object with 
+#' The start and end fields must be integers and all end values
+#' must be greater than all start values.
+#' Finally, 'seqnames' cannot contain the semicolon (';'), colon (';'), or dash
+#' ('-') characters. These characters are used in subsequent processing steps
+#' to define and combine intervals, e.g. \code{"seq:1-10;seq:15-25"} would
+#' represent a combined interval consisting of positions 1-10 and 15-25 on 
+#' 'seq'.
+#' 
+#' Converting a [GRanges][GenomicRanges::GRanges] object with 
 #' [as.data.table][data.table::as.data.table] will create a valid interval 
 #' object. 
 #' 
@@ -32,6 +38,7 @@ cnvValidInterval <- function(x) {
   t3 <- try(is.integer(x$start), silent = TRUE)
   t4 <- try(is.integer(x$end), silent = TRUE)
   t5 <- try(all(x$end > x$start), silent = TRUE)
+  t6 <- try(!any(grepl("-|;|:", x$seqnames)))
   t1 && t2 && t3 && t4 && t5
 }
 

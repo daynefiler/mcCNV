@@ -75,9 +75,9 @@
 #' overlapping molecules for each of the given intervals
 #' 
 #' @param bamfile Character of length 1, the file path to the .bam file
-#' @param int data.table object containing the intervals to count 
+#' @param interval data.table object containing the intervals to count 
 #' molecules over; see \code{?cnvValidInterval}
-#' @param sbj Character of length 1, the subject name for bam file; 
+#' @param subject Character of length 1, the subject name for bam file; 
 #' defaults to 'bamfile' parameter when NULL
 #' @param verbose TRUE/FALSE
 #' 
@@ -94,23 +94,25 @@
 #' @importFrom Rsamtools scanBamHeader scanBamFlag
 #' @export 
 
-cnvGetCounts <- function(bamfile, int, sbj = NULL, verbose = TRUE) {
+cnvGetCounts <- function(bamfile, interval, subject = NULL, verbose = TRUE) {
   
   ## Check input parameters
   if (missing(bamfile)) stop("Must provide 'bamfile'; see ?cnvGetCounts")
-  if (missing(int)) stop("Must provide 'int'; see ?cnvGetCounts")
+  if (missing(interval)) stop("Must provide 'interval'; see ?cnvGetCounts")
   if (length(bamfile) > 1) stop("'bamfile' must be of length 1")
   if (!file.exists(bamfile)) stop("Given 'bamfile' does not exist")
-  if (is.null(sbj)) sbj <- bamfile
-  if (length(sbj) > 1) stop("'sbj' must be of length 1")
-  if (!cnvValidInterval(int)) stop("Invalid 'int'; see ?cnvValidInterval")
+  if (is.null(subject)) subject <- bamfile
+  if (length(subject) > 1) stop("'subject' must be of length 1")
+  if (!cnvValidInterval(interval)) {
+    stop("Invalid 'interval'; see ?cnvValidInterval")
+  }
   
   ## Get reference intervals from bamfile
   ref <- scanBamHeader(bamfile, what = "targets")[[1]][[1]]
-  ref <- ref[as.character(unique(int$seqnames))]
+  ref <- ref[as.character(unique(interval$seqnames))]
   ref <- GRanges(names(ref), IRanges(start = 1, width = ref))
   names(ref) <- seqnames(ref)
-  ref <- ref[unique(int$seqnames)]
+  ref <- ref[unique(interval$seqnames)]
   
   ## Load reads from bamfile that span the given reference 
   flds <- c("qname", "flag", "strand", "rname", "pos", "mapq", 
@@ -137,17 +139,17 @@ cnvGetCounts <- function(bamfile, int, sbj = NULL, verbose = TRUE) {
     setorder(rds, qname, strand)
     if (verbose) cat("done.\n")
     if (nrow(rds) == 0) {
-      cts[[r]] <- data.table(int[seqnames == r], 
+      cts[[r]] <- data.table(interval[seqnames == r], 
                              molCount = NA_integer_,
                              ncCoverMult = NA_integer_)
       
     } else {
-      cts[[r]] <- .procReads(rds, int[seqnames == r], verbose = verbose)
+      cts[[r]] <- .procReads(rds, interval[seqnames == r], verbose = verbose)
     }
   }
   
   cts <- rbindlist(cts)
-  cts[ , sbj := sbj]
+  cts[ , subject := subject]
   cts[]
   
 }

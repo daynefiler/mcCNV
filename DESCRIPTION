@@ -2,14 +2,38 @@ Package: mcCNV
 Type: Package
 Title: Call copy number variants from whole exome/whole genome sequencing data
 Version: 0.1.0
-Authors@R: c(person("Dayne L", "Filer", 
-    role = c("aut", "cre"), 
-    email = "dayne.filer@gmail.com")) 
+Authors@R: 
+    c(person("Dayne L", "Filer", 
+             role = c("aut", "cre"), 
+             email = "dayne.filer@gmail.com"),
+      person("Kirk C", "Wilhelmsen",
+             role = c("ctb", "ths")))
 Maintainer: Dayne Filer <dayne.filer@gmail.com>
-Description: To be added. 
+Description: The package provides a framework for performing depth-based copy
+    number variation estimation. The package is intended to be used with whole-
+    exome sequencing data generated with multiplexed capture (all exomes 
+    captured in a single pooled step). The package provides functionality for
+    counting depth over provided intervals, then computes the maximum 
+    likelihood copy number based on the negative binomial distribution (adapted
+    from the 'sSeq' algorithm, <doi:10.1093/bioinformatics/btt143>). Additional
+    functionality is provided to simulate read-depth data, helpful for defining
+    sequencing depth requirements and selecting prior values.
 Encoding: UTF-8
 LazyData: true
-Imports: Rsamtools, dlfUtils, S4Vectors, matrixStats, GenomicRanges, IRanges,
-    Rfast, parallel, stats, IRanges, GenomeInfoDb, utils, data.table
+Imports: 
+    Rsamtools,
+    dlfUtils,
+    matrixStats,
+    GenomicRanges,
+    IRanges,
+    Rfast,
+    parallel,
+    stats,
+    IRanges,
+    GenomeInfoDb,
+    utils
+Depends: 
+    data.table (>= 1.12.8),
+    R (>= 3.6)
 RoxygenNote: 7.1.0
 Roxygen: list(markdown = TRUE)

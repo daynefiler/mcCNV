@@ -4,15 +4,15 @@
 \alias{cnvGetCounts}
 \title{Count molecules from a bam file overlapping given intervals}
 \usage{
-cnvGetCounts(bamfile, int, sbj = NULL, verbose = TRUE)
+cnvGetCounts(bamfile, interval, subject = NULL, verbose = TRUE)
 }
 \arguments{
 \item{bamfile}{Character of length 1, the file path to the .bam file}
 
-\item{int}{data.table object containing the intervals to count
+\item{interval}{data.table object containing the intervals to count
 molecules over; see \code{?cnvValidInterval}}
 
-\item{sbj}{Character of length 1, the subject name for bam file;
+\item{subject}{Character of length 1, the subject name for bam file;
 defaults to 'bamfile' parameter when NULL}
 
 \item{verbose}{TRUE/FALSE}
