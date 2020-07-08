@@ -5,36 +5,30 @@
 \title{Call copy number-state for the given data}
 \usage{
 cnvCallCN(
-  cnts,
+  counts,
   prior,
-  width = 1:5,
-  min.dlt = 20,
-  max.its = 30,
-  outfile = NULL,
-  agg = FALSE,
-  shrink = TRUE,
-  keep.cols = NULL,
-  verbose = FALSE,
-  return.res = TRUE
+  width = 1L,
+  delta = 20L,
+  iterations = 30L,
+  verbose = TRUE
 )
 }
 \arguments{
-\item{cnts}{the input data, see details}
+\item{counts}{data.table \link[=validObjects]{counts object}}
 
-\item{prior}{numeric of length 1, the prior probability of having a CNV}
+\item{prior}{numeric of length 1, the prior probability used to estimate
+copy number variants; see details}
 
-\item{width}{integer, window of contiguous exons to calculate CN on; can
-provide a vector with multiple widths}
+\item{width}{integer, window of contiguous intervals to calculate CN on; can
+provide a vector with multiple widths (defaults to 1)}
 
-\item{min.dlt}{integer of length 1, the target number of changes in copy-
-state to stop the alogorithm}
+\item{delta}{integer of length 1, minimum copy number state changes to stop
+the algorithm; see details}
 
-\item{max.its}{integer of length 1, the maximum number of iterations}
+\item{iterations}{integer of length 1, the maximum number of iterations
+before stopping algorithm; see details}
 
-\item{outfile}{character of length 1, when not NULL, save .RDS file to the
-file given}
-
-\item{shrink}{logical of length 1, shrinkage applied to phi when TRUE}
+\item{verbose}{TRUE/FALSE}
 }
 \description{
 Call copy number-state for the given data

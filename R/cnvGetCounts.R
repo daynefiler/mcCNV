@@ -32,8 +32,7 @@
 cnvGetCounts <- function(bamfile, interval, subject = NULL, verbose = TRUE) {
   
   ## Check input parameters
-  if (missing(bamfile)) stop("Must provide 'bamfile'; see ?cnvGetCounts")
-  if (missing(interval)) stop("Must provide 'interval'; see ?cnvGetCounts")
+  stopifnot(is.logical(verbose) && length(verbose) == 1)
   if (length(bamfile) > 1) stop("'bamfile' must be of length 1")
   if (!file.exists(bamfile)) stop("Given 'bamfile' does not exist")
   if (is.null(subject)) subject <- bamfile

@@ -12,7 +12,7 @@ cnvGatherCounts(files, glob = TRUE, ...)
 \item{glob}{Logical, should the given 'files' parameter be passed to
 \link[base:Sys.glob]{Sys.glob()}? Defaults to TRUE}
 
-\item{...}{arguments passed to \code{\link[parallel]{mclapply}}}
+\item{...}{arguments passed to \link[parallel:mclapply]{mclapply}}
 }
 \description{
 \code{cnvGatherCounts} reads \link[=validObjects]{count objects}
