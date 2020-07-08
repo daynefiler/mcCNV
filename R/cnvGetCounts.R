@@ -127,6 +127,8 @@ cnvGetCounts <- function(bamfile, interval, subject = NULL, verbose = TRUE) {
   cts <- vector(mode = "list", length = length(ref))
   names(cts) <- names(ref)
   
+  if (verbose) cat("Processing bamfile: ", bamfile, "\n")
+  
   for (r in names(ref)) {
     
     if (verbose) cat("Reading ", r, "...")

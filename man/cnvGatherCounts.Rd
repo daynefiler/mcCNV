@@ -2,28 +2,25 @@
 % Please edit documentation in R/cnvGatherCounts.R
 \name{cnvGatherCounts}
 \alias{cnvGatherCounts}
-\title{Gather saved counts into one data.table}
+\title{Gather saved count objects into one data.table}
 \usage{
-cnvGatherCounts(
-  input,
-  outfile = NULL,
-  results = TRUE,
-  glob = FALSE,
-  cast = FALSE,
-  ...
-)
+cnvGatherCounts(files, glob = TRUE, ...)
 }
 \arguments{
-\item{input}{Character, directories and/or files to read in}
+\item{files}{Character, file paths pointing to count objects; see details}
 
-\item{glob}{Logical, should the paths for input counts be expanded using
-wildcards?}
-
-\item{cast}{Logical of length 1, should the data be cast from long to wide
-(i.e. from a single count column to 1 sample per column?)}
+\item{glob}{Logical, should the given 'files' parameter be passed to
+\link[base:Sys.glob]{Sys.glob()}? Defaults to TRUE}
 
 \item{...}{arguments passed to \code{\link[parallel]{mclapply}}}
 }
 \description{
-This help file needs a lot of work
+\code{cnvGatherCounts} reads \link[=validObjects]{count objects}
+stored in disk space, and combines them into a single multiple-sample count
+object.
+}
+\details{
+The 'files' parameter must point to valid \link[=validObjects]{count objects}
+saved to disk using the \link[base:saveRDS]{saveRDS()} function. When 'glob' is
+\code{TRUE}, the default, any wildcards in 'files' will be expanded.
 }

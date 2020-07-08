@@ -1,3 +1,7 @@
+##----------------------------------------------------------------------------##
+## cnvValidity* functions
+##----------------------------------------------------------------------------##
+
 #' @rdname validObjects
 #' @name validObjects
 #' @title Functions to check for appropriate data structures
@@ -38,7 +42,7 @@ cnvValidInterval <- function(x) {
   t3 <- try(is.integer(x$start), silent = TRUE)
   t4 <- try(is.integer(x$end), silent = TRUE)
   t5 <- try(all(x$end > x$start), silent = TRUE)
-  t6 <- try(!any(grepl("-|;|:", x$seqnames)))
+  t6 <- try(!any(grepl("-|;|:", x$seqnames)), silent = TRUE)
   t1 && t2 && t3 && t4 && t5
 }
 
