@@ -1,15 +1,48 @@
 ##----------------------------------------------------------------------------##
-## .calcShrPhi: shrink the phi values
+## Utility functions for unpacking Rsamtools::scanBam objects
 ##----------------------------------------------------------------------------##
 
-#' @name calcShrPhi
-#' @title Shrink phi values
-#' 
-#' @param phi numeric, the phi values to shrink
-#' 
-#' @details 
-#' Need to add.
-#' 
+.unpackTag <- function(l, tags) {
+  
+  # @description \code{.unpackTag} simply extracts the tag values from the list
+  # returned by Rsamtools:scanBam. This allows for collapsing the list into
+  # a data.table object. 
+  # 
+  # @param l List object returned by Rsamtools::scanBam
+  # @param tags Character, the tag names to unpack
+  
+  tmp <- function(x) {
+    x[tags] <- x$tag[tags]
+    n <- length(x[[1]])
+    ind <- sapply(x[tags], is.null)
+    if (n > 0 & any(ind)) x[tags[ind]] <- list(rep(NA, n))
+    x$tag <- NULL
+    x
+  }
+  lapply(l, tmp)
+}
+
+.unpackSeq <- function(l) {
+  # @description \code{.unpackSeq} converts the seq values to simple character 
+  # strings from the list returned by Rsamtools:scanBam. This allows for 
+  # collapsing the list into a data.table object. 
+  # 
+  # @param l List object returned by Rsamtools::scanBam
+  lapply(l, function(x) {x$seq <- as.character(x$seq); x})
+}
+
+.unpackQual <- function(l) {
+  # @description \code{.unpackQual} converts the qual values to simple character 
+  # strings from the list returned by Rsamtools:scanBam. This allows for 
+  # collapsing the list into a data.table object. 
+  # 
+  # @param l List object returned by Rsamtools::scanBam
+  lapply(l, function(x) {x$qual <- as.character(x$qual); x})
+}
+
+##----------------------------------------------------------------------------##
+## .calcShrPhi: shrink the phi values
+##----------------------------------------------------------------------------##
 
 .calcShrPhi <- function(phi) {
   
@@ -25,52 +58,15 @@
 }
 
 ##----------------------------------------------------------------------------##
-## .calcShrPhi: Calculate the MLCN-state for a subject
-##----------------------------------------------------------------------------##
-
-#' @name calcMLCN
-#' @title Calculate the maximum likelihood copy number-state for a subject
-#' 
-#' @param N integer of length 1, the molecule counts for the subject
-#' @param mu numeric of length 1, the locus mean counts for the group 
-#' @param sf numeric of length 1, the size-factor adjustment for the subject
-#' @param phi numeric of length 1, the locus phi/dispersion value for the group 
-#' @param prior numeric of length 1, the prior probabilty of having a CNV
-#' 
-#' @details 
-#' Need to add
-#' 
-#' @return list, first element gives the most likely copy number-state and 
-#' the second element gives the likelihood value
-#' 
-
-.calcMLCN <- function(N, mu, sf, phi, prior) {
-  
-  cs <- c(0.001, 0.5, 1, 1.5, 2.0, 2.5, 3.0, 3.5, 4)
-  cp <- rep(prior, length(cs)); cp[which(cs == 1)] <- 1 - prior
-  pr <- lapply(cs, function(x) list(p = 1/(mu*phi*x + 1), r = sf/phi))
-  cdf <- sapply(pr, function(x) pnbinom(N, size = x$r, prob = x$p))
-  lk <- ifelse(cdf >= 0.5, 2*(1 - cdf), 2*cdf)
-  list(cs[which.max(lk*cp)], max(lk*cp))
-  
-}
-
-##----------------------------------------------------------------------------##
 ## .clpsExon: Collapse exons by specified width 
 ##----------------------------------------------------------------------------##
 
-#' @name clpsExon
-#' @title Collapse exons by specified width 
-#' 
-#' @param dat data.table object containing the counts
-#' @param cw integer of length 1, the width to collapse by
-#' 
-#' @details 
-#' Need to add
-#' 
 #' @import data.table
 
 .clpsExon <- function(dat, cw) {
+  
+  # @param dat data.table object containing the counts
+  # @param cw integer of length 1, the width to collapse by
   
   ## Set the order based on the chromosome & start position, or the ref 
   ## column if chr and spos not given (helpful for simulated data)
@@ -81,7 +77,7 @@
   scols <- c("ref", "N")
   if ("actCN" %in% names(dat)) scols <- c(scols, "actCN")
   dat <- dat[ , 
-              data.table::shift(x = .SD, n = 0:aw, type = "shift", give.names = TRUE), 
+              shift(x = .SD, n = 0:aw, type = "shift", give.names = TRUE), 
               by = shiftby,
               .SDcols = scols]
   dat[ , N := rowSums(.SD), .SDcols = grep("^N_shift", colnames(dat))]
@@ -104,24 +100,19 @@
 ## .callCN: Call CNS
 ##----------------------------------------------------------------------------##
 
-#' @name callCN
-#' @title Call copy number-state
-#' 
-#' @param cnts data.table object containing the counts
-#' @param prior numeric of length 1, the prior probability of having a CNV
-#' @param min.dlt integer of length 1, the target number of changes in copy-
-#' state to stop the alogorithm 
-#' @param max.its integer of length 1, the maximum number of iterations
-#' @param shrink logical of length 1, shrinkage applied to phi when TRUE
-#' 
-#' @details 
-#' Need to add
-#' 
 #' @importFrom Rfast rowMaxs
 #' @importFrom matrixStats rowLogSumExps
+#' @importFrom stats dnbinom
 #' @import data.table
 
 .callCN <- function(cnts, min.dlt, max.its, prior, shrink = TRUE) {
+  
+  # @param cnts data.table object containing the counts
+  # @param prior numeric of length 1, the prior probability of having a CNV
+  # @param min.dlt integer of length 1, the target number of changes in copy-
+  # state to stop the alogorithm 
+  # @param max.its integer of length 1, the maximum number of iterations
+  # @param shrink logical of length 1, shrinkage applied to phi when TRUE
   
   cnts[ , CN := 1]
   
@@ -183,4 +174,3 @@
   cnts[]
   
 }
-
