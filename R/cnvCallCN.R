@@ -1,16 +1,20 @@
 ##----------------------------------------------------------------------------##
-## cnvCallCN: Call CN-states
+## cnvCallCN
 ##----------------------------------------------------------------------------##
 
 #' @name cnvCallCN
 #' @title Call copy number-state for the given data
 #' 
-#' @param cnts the input data, see details
-#' @param width integer, window of contiguous exons to calculate CN on; can 
-#' provide a vector with multiple widths
-#' @param outfile character of length 1, when not NULL, save .RDS file to the
-#' file given
-#' @inheritParams callCN
+#' @param counts data.table [counts object][validObjects]
+#' @param width integer, window of contiguous intervals to calculate CN on; can 
+#' provide a vector with multiple widths (defaults to 1)
+#' @param prior numeric of length 1, the prior probability used to estimate
+#' copy number variants; see details
+#' @param delta integer of length 1, minimum copy number state changes to stop
+#' the algorithm; see details
+#' @param iterations integer of length 1, the maximum number of iterations 
+#' before stopping algorithm; see details
+#' @param verbose TRUE/FALSE
 #' 
 #' @details 
 #' Need to add
@@ -18,64 +22,46 @@
 #' @import data.table
 #' @export
 
-cnvCallCN <- function(cnts, prior, width = 1:5, min.dlt = 20, max.its = 30, 
-                      outfile = NULL, agg = FALSE, shrink = TRUE,
-                      keep.cols = NULL, verbose = FALSE,
-                      return.res = TRUE) {
+cnvCallCN <- function(counts, 
+                      prior, 
+                      width = 1L, 
+                      delta = 20L, 
+                      iterations = 30L, 
+                      verbose = TRUE) {
   
-  if (is.data.frame(cnts)) {
-    if (!is.data.table(cnts)) cnts <- as.data.table(cnts)
-  } else {
-    if (verbose) cat("Reading file...")
-    cnts <- readRDS(file = cnts)
-    if (!is.data.table(cnts)) cnts <- as.data.table(cnts)
-    if (verbose) cat("done.\n")
-  }
+  stopifnot(cnvValidCounts(counts))
+  stopifnot(is.numeric(prior) && length(prior) == 1)
+  stopifnot(is.integer(width))
+  stopifnot(is.integer(delta) && length(delta) == 1)
+  stopifnot(is.integer(iterations) && length(iterations) == 1)
+  stopifnot(is.logical(verbose) && length(verbose) == 1)
   
-  ## Need to add more data checks. 
-  if (cnts[ , .(use = sum(N > 10)), by = sbj][ , any(abs(scale(use)) > 2)]) {
-    warning("At least one sample seems to have a disproportionate number\n",
-            "of refs with >=10 molecule counts.")
-  }
+  ## Create interval names as seqnames:start-end
+  counts[ , intName := sprintf("%s:%d-%d", seqnames, start, end)]
   
-  if (verbose) cat("Collapsing exons...")
-  cnts <- rbindlist(lapply(width, .clpsExon, dat = cnts))
+  if (verbose) cat("Collapsing intervals...")
+  counts <- rbindlist(lapply(width, .clpsExon, dat = counts))
   if (verbose) cat("done.\n")
   
   if (verbose) cat("Calling CNVs...")
-  cnts <- .callCN(cnts = cnts, 
-                  min.dlt = min.dlt, 
-                  max.its = max.its, 
-                  prior = prior,
-                  shrink = shrink)
+  calls <- .callCN(cnts = counts, 
+                   delta = delta, 
+                   iterations = iterations, 
+                   prior = prior,
+                   shrink = TRUE)
   if (verbose) cat("done.\n")
   
-  its <- attr(cnts, "its")
+  ## Overwrite placeholder CN == 0.001; negate calls where a mean was not 
+  ## established
+  calls[CN == 0.001, CN := 0.0]
+  calls[is.na(mn), CN := NA]
   
-  if (!is.null(keep.cols)) {
-    keep.anyway <- c("sbj", "ref", "CN")
-    if (agg) keep.anyway <- c(keep.anyway, "lk", "width", "loc")
-    cols <- names(cnts)
-    cols <- intersect(c(keep.cols, keep.anyway), cols)
-    cnts <- cnts[ , .SD, .SDcols = cols]
-  }
+  calls[ , c("adjN", "use", "geomn", "seqnames") := NULL]
+  n0 <- c("phi", "mn", "vr", "width", "sf", "llk", "lp", "lp1")
+  n1 <- c("intPhi", "intMean", "intSD", "intWidth", "sbjSizeFactor", 
+          "cnLogLik", "cnLogP", "cn1LogP")
+  setnames(calls, n0, n1)
   
-  if (agg & width > 1) {
-    if (verbose) cat("Aggregating calls...")
-    cnts <- cnvAggCall(cnts, width = width)
-    if (verbose) cat("done.\n")
-  }
-  
-  setattr(cnts, "its", its)
-  
-  if (!is.null(outfile)) {
-    if (verbose) cat("Writing output to file...")
-    saveRDS(cnts, file = outfile)
-    if (verbose) cat("done.\n")
-  }
-  
-  if (return.res) return(cnts[])
-  
-  TRUE
+  calls[]
   
 }

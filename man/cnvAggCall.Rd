@@ -4,13 +4,10 @@
 \alias{cnvAggCall}
 \title{Aggregate CN-state calls from different widths to single call}
 \usage{
-cnvAggCall(dat, width = 5)
+cnvAggCall(calls)
 }
 \arguments{
 \item{dat}{the input data, see details}
-
-\item{width}{integer, window of contiguous intervals to calculate CN on; can
-provide a vector with multiple widths (defaults to 1)}
 }
 \description{
 Aggregate CN-state calls from different widths to single call

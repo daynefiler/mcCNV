@@ -73,3 +73,22 @@ cnvValidCounts <- function(x) {
   t4 <- try(is.integer(x$nCoverMult), silent = TRUE)
   t1 && t2 && t3 && t4
 }
+
+#' @rdname validObjects 
+#' @section Call objects:
+#' Call objects list the estimated copy number for each interval.
+#' 
+#' @import data.table
+#' @export
+
+cnvValidCalls <- function(x) {
+  t1 <- is.data.table(x)
+  nms <- c("intName", "subject", "sbjSizeFactor", "molCount", 
+           "intWidth", "intMean", "intPhi", "intSD", 
+           "CN", "cnLogLik", "cnLogP", "cn1LogP")
+  t2 <- try(all(nms %in% names(x)), silent = TRUE)
+  t3 <- try(is.numeric(x$CN), silent = TRUE)
+  t4 <- try(all(x$CN %% 0.5 == 0, na.rm = TRUE), silent = TRUE)
+  t5 <- try(is.numeric(x$cnLogP), silent = TRUE)
+  t1 && t2 && t3 && t4 && t5
+}

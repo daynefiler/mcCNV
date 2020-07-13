@@ -17,38 +17,36 @@
 #' @import data.table
 #' @export
 
-cnvAggCall <- function(dat, width = 5) {
+cnvAggCall <- function(calls) {
   
-  cols <- paste0("r", seq(width))
-  dat[ , (cols) := tstrsplit(ref, split = ";", names = FALSE)]
-  dat[ , ref := NULL]
+  stopifnot(cnvValidCalls(calls))
   
-  ind <- lapply(cols, function(x) dat[ , which(!is.na(get(x)))])
-  dat <- dat[unlist(ind)]
-  dat[ , loc := rep(1:length(ind), sapply(ind, length))]
-  dat[ , tmp := paste0("r", loc)]
+  cols <- paste0("int", seq(max(calls$intWidth)))
+  calls[ , (cols) := tstrsplit(intName, split = ";", names = FALSE)]
+  calls[ , intName := NULL]
+  
+  ind <- lapply(cols, function(x) calls[ , which(!is.na(get(x)))])
+  calls <- calls[unlist(ind)]
+  calls[ , loc := rep(1:length(ind), sapply(ind, length))]
+  calls[ , tmp := paste0("int", loc)]
   rm(ind); gc()
   
-  for (i in cols) dat[tmp == i, sngl := get(i)]
+  for (i in cols) calls[tmp == i, intName := get(i)]
   
-  dat[ , (c(cols, "tmp")) := NULL]
-  gc()
-  dat[ , CNV := CN != 1]
-  dat[ , C1 := any(CNV), by = list(sbj, sngl)]
+  calls[ , (c(cols, "tmp")) := NULL]
   
-  if (any(grepl("actCN", colnames(dat)))) {
-    dat[ ,
-         actCNSngl := actCN[width == 1], 
-         by = list(sbj, sngl)]
+  calls[ , CNV := CN != 1]
+  setindexv(calls, c("subject", "intName"))
+  calls[ , C1 := any(CNV, na.rm = TRUE), by = list(subject, intName)]
+  
+  if ("actCN" %in% names(calls)) {
+    calls[ , actCN1 := actCN[intWidth == 1], by = .(subject, intName)]
   }
   
-  
-  setorder(dat, sbj, sngl, -CNV, -lp)
-  ind <- dat[ , list(ind = .I[1]), by = list(sbj, sngl)]$ind
-  dat[ , CNV := NULL]
-  dat <- dat[ind]
-  rm(ind); gc()
-  
-  dat[]
+  setorder(calls, subject, intName, -CNV, -cnLogP)
+  ind <- calls[ , .(ind = .I[1]), by = .(subject, intName)]$ind
+  calls[ , CNV := NULL]
+  calls <- calls[ind]
+  calls[]
   
 }

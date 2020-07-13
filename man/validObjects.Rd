@@ -4,11 +4,14 @@
 \alias{validObjects}
 \alias{cnvValidInterval}
 \alias{cnvValidCounts}
+\alias{cnvValidCalls}
 \title{Functions to check for appropriate data structures}
 \usage{
 cnvValidInterval(x)
 
 cnvValidCounts(x)
+
+cnvValidCalls(x)
 }
 \description{
 For efficiency, the mcCNV package does not currently formalize
@@ -54,5 +57,10 @@ by \link{cnvGetCounts}.
 We provide the \link{cnvGatherCounts} convenience function for reading
 \link[base:saveRDS]{saved count objects}, and combining them into a single
 multiple-subject count object required by \link{cnvCallCN}.
+}
+
+\section{Call objects}{
+
+Call objects list the estimated copy number for each interval.
 }
 
