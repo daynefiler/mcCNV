@@ -17,9 +17,14 @@
 
 cnvCountsToMatrix <- function(counts) {
   stopifnot(cnvValidCounts(counts))
+  counts <- copy(counts)
   svec <- unique(counts$subject)
   counts[ , intName := sprintf("%s:%d-%d", seqnames, start, end)]
-  mat <- dcast(counts, intName ~ subject, value.var = "molCount")
+  frm <- formula(intName + start + seqnames ~ subject)
+  mat <- dcast(counts, frm, value.var = "molCount")
+  setorder(mat, seqnames, start)
+  mat[ , c("start", "seqnames") := NULL]
   mat <- as.matrix(mat, rownames = "intName")
+  mat
 }
 
