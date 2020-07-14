@@ -37,7 +37,7 @@ cnvAggCall <- function(calls) {
   
   calls[ , CNV := CN != 1]
   setindexv(calls, c("subject", "intName"))
-  calls[ , C1 := any(CNV, na.rm = TRUE), by = list(subject, intName)]
+  calls[ , anyCNV := any(CNV, na.rm = TRUE), by = list(subject, intName)]
   
   if ("actCN" %in% names(calls)) {
     calls[ , actCN1 := actCN[intWidth == 1], by = .(subject, intName)]
