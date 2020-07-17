@@ -91,9 +91,16 @@ cnvSimCounts <- function(totalMolecules = 1e7L,
       cnts[ , vwid := 0L]
       cnts[actCN != 1, 
            vwid := sample(x = variantWidth, size = .N, replace = TRUE)]
-      ind <- cnts[ , unlist(mapply(seq, .I, length = vwid))]
-      newCN <- cnts[actCN != 1, unlist(mapply(rep, actCN, each = vwid))]
-      cnts[ind, actCN := newCN]
+      ## Expanding by seqnames here makes sure a variant doesn't spill off the
+      ## end of one chromosome onto the beginning of another, or off the end of
+      ## the genome
+      ind <- cnts[ , 
+                  .(stop = max(.I), 
+                    ind = unlist(mapply(seq, .I, length = vwid))),
+                  by = seqnames]
+      ind[ , newCN := cnts[actCN != 1, unlist(mapply(rep, actCN, each = vwid))]]
+      ind <- ind[ind <= stop]
+      cnts[ind$ind, actCN := ind$newCN]
       cnts[ , vwid := NULL]
     }
   }
