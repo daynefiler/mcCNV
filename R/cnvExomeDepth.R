@@ -13,7 +13,7 @@
 #' the computation when available.
 #' 
 #' @import data.table
-#' @importFrom parallel mclapply mcmapply detectCores
+#' @importFrom parallel mclapply mcmapply
 #' @importFrom ExomeDepth select.reference.set CallCNVs
 #' @importClassesFrom ExomeDepth ExomeDepth
 #' @export 
@@ -57,7 +57,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
     d <- as.data.table(x@CNV.calls)
     i1 <- d[ , unlist(mapply(seq, start.p, end.p, SIMPLIFY = FALSE))]
     d <- d[d[ , rep(.I, nexons)]]
-    d <- d[ , .(type, nexons, BF, reads.expected, reads.observed)]
+    d <- d[ , .(type, nexons, BF, reads.expected, reads.observed, varID = id)]
     d <- cbind(int[i1], d)
     d[ , subject := s]
     d[]
@@ -68,7 +68,8 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
   setkey(calls, subject, seqnames, start, end)
   setkey(counts, subject, seqnames, start, end)
   calls <- calls[counts]
-  calls[]
+  calls[ , intName := sprintf("%s:%s-%s", seqnames, start, end)]
+  calls[is.na(varID), varID := intName]
   
   makeCorTbl <- function(sbj) {
     tbl <- as.data.table(refList[[sbj]]$summary.stats)
