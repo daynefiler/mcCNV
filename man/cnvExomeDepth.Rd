@@ -20,5 +20,6 @@ Wrapper to run the ExomeDepth algorithm on a
 \details{
 Runs ExomeDepth using the default parameters, then maps the call information
 back to the counts object.
-Will use 'mclapply' to parallelize the computation when available.
+Will use \code{\link[parallel:mclapply]{parallel::mclapply()}} & \code{\link[parallel:mcmapply]{parallel::mcmapply()}} to parallelize
+the computation when available.
 }

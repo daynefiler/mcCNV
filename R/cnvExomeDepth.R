@@ -8,10 +8,11 @@
 #' @details 
 #' Runs ExomeDepth using the default parameters, then maps the call information 
 #' back to the counts object.
-#' Will use 'mclapply' to parallelize the computation when available.
+#' Will use [parallel::mclapply()] & [parallel::mcmapply()] to parallelize 
+#' the computation when available.
 #' 
 #' @import data.table
-#' @importFrom parallel mclapply
+#' @importFrom parallel mclapply mcmapply
 #' @importFrom ExomeDepth select.reference.set CallCNVs
 #' @importClassesFrom ExomeDepth ExomeDepth
 #' @export 
@@ -67,6 +68,20 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4) {
   setkey(counts, subject, seqnames, start, end)
   calls <- calls[counts]
   calls[]
+  
+  makeCorTbl <- function(sbj) {
+    tbl <- as.data.table(refList[[sbj]]$summary.stats)
+    tbl[ , subject := sbj]
+    tbl[ , selected := ref.samples %in% refList[[sbj]]$reference.choice]
+    v <- cor(cmat[ , sbj], rowSums(cmat[ , refList[[sbj]]$reference.choice]))
+    tbl[ , overallCor := v]
+    tbl[]
+  }
+  
+  correlations <- rbindlist(lapply(sbjVec, makeCorTbl))
+  setcolorder(correlations, "subject")
+  
+  list(calls = calls[], correlations = correlations[])
   
 }
 
