@@ -4,6 +4,7 @@
 #' @param counts data.table [counts object][validObjects]
 #' @param transProb passed to [ExomeDepth::CallCNVs] 'transition.probability'
 #' @param cnvLength passed to [ExomeDepth::CallCNVs] 'expected.CNV.length'
+#' @param ... arguments passed to [mclapply][parallel::mclapply]
 #' 
 #' @details 
 #' Runs ExomeDepth using the default parameters, then maps the call information 
@@ -12,12 +13,12 @@
 #' the computation when available.
 #' 
 #' @import data.table
-#' @importFrom parallel mclapply mcmapply
+#' @importFrom parallel mclapply mcmapply detectCores
 #' @importFrom ExomeDepth select.reference.set CallCNVs
 #' @importClassesFrom ExomeDepth ExomeDepth
 #' @export 
 
-cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4) {
+cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
   
   cmat <- cnvCountsToMatrix(counts)
   int <- unique(counts[ , .(seqnames, start, end)])
@@ -32,7 +33,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4) {
                          n.bins.reduced = min(1e4, nrow(cmat)))
   }
   
-  refList <- mclapply(sbjVec, getRef)
+  refList <- mclapply(sbjVec, getRef, ...)
   names(refList) <- sbjVec
   
   calcCN <- function(sbj) {
@@ -50,7 +51,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4) {
     cn
   }
   
-  cnList <- mclapply(sbjVec, calcCN)
+  cnList <- mclapply(sbjVec, calcCN, ...)
   
   xpndCNV <- function(x, s) {
     d <- as.data.table(x@CNV.calls)
@@ -62,7 +63,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4) {
     d[]
   }
   
-  calls <- mcmapply(xpndCNV, x = cnList, s = sbjVec, SIMPLIFY = FALSE)
+  calls <- mcmapply(xpndCNV, x = cnList, s = sbjVec, SIMPLIFY = FALSE, ...)
   calls <- rbindlist(calls)
   setkey(calls, subject, seqnames, start, end)
   setkey(counts, subject, seqnames, start, end)
@@ -78,7 +79,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4) {
     tbl[]
   }
   
-  correlations <- rbindlist(lapply(sbjVec, makeCorTbl))
+  correlations <- rbindlist(mclapply(sbjVec, makeCorTbl, ...))
   setcolorder(correlations, "subject")
   
   list(calls = calls[], correlations = correlations[])

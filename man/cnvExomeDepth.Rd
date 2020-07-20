@@ -4,7 +4,7 @@
 \alias{cnvExomeDepth}
 \title{Run ExomeDepth on mcCNV counts object}
 \usage{
-cnvExomeDepth(counts, transProb = 1e-04, cnvLength = 50000)
+cnvExomeDepth(counts, transProb = 1e-04, cnvLength = 50000, ...)
 }
 \arguments{
 \item{counts}{data.table \link[=validObjects]{counts object}}
@@ -12,6 +12,8 @@ cnvExomeDepth(counts, transProb = 1e-04, cnvLength = 50000)
 \item{transProb}{passed to \link[ExomeDepth:CallCNVs]{ExomeDepth::CallCNVs} 'transition.probability'}
 
 \item{cnvLength}{passed to \link[ExomeDepth:CallCNVs]{ExomeDepth::CallCNVs} 'expected.CNV.length'}
+
+\item{...}{arguments passed to \link[parallel:mclapply]{mclapply}}
 }
 \description{
 Wrapper to run the ExomeDepth algorithm on a
