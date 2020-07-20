@@ -2,6 +2,9 @@
 #' @description Wrapper to run the ExomeDepth algorithm on a 
 #' [counts object][validObjects]
 #' @param counts data.table [counts object][validObjects]
+#' @param transProb passed to [ExomeDepth::CallCNVs] 'transition.probability'
+#' @param cnvLength passed to [ExomeDepth::CallCNVs] 'expected.CNV.length'
+#' 
 #' @details 
 #' Runs ExomeDepth using the default parameters, then maps the call information 
 #' back to the counts object.
@@ -13,7 +16,7 @@
 #' @importClassesFrom ExomeDepth ExomeDepth
 #' @export 
 
-cnvExomeDepth <- function(counts) {
+cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4) {
   
   cmat <- cnvCountsToMatrix(counts)
   int <- unique(counts[ , .(seqnames, start, end)])
@@ -40,7 +43,9 @@ cnvExomeDepth <- function(counts) {
                    chromosome = int$seqnames, 
                    start = int$start,
                    end = int$end,
-                   name = int$intName)
+                   name = int$intName,
+                   transition.probability = transProb,
+                   expected.CNV.length = cnvLength)
     cn
   }
   
