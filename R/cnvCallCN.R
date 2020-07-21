@@ -58,7 +58,7 @@ cnvCallCN <- function(counts,
   
   calls[ , c("adjN", "use", "geomn", "seqnames") := NULL]
   n0 <- c("phi", "mn", "vr", "width", "sf", "llk", "lp", "lp1")
-  n1 <- c("intPhi", "intMean", "intSD", "intWidth", "sbjSizeFactor", 
+  n1 <- c("intPhi", "intMean", "intVar", "intWidth", "sbjSizeFactor", 
           "cnLogLik", "cnLogP", "cn1LogP")
   setnames(calls, n0, n1)
   

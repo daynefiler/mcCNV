@@ -84,7 +84,7 @@ cnvValidCounts <- function(x) {
 cnvValidCalls <- function(x) {
   t1 <- is.data.table(x)
   nms <- c("intName", "subject", "sbjSizeFactor", "molCount", 
-           "intWidth", "intMean", "intPhi", "intSD", 
+           "intWidth", "intMean", "intPhi", "intVar", 
            "CN", "cnLogLik", "cnLogP", "cn1LogP")
   t2 <- try(all(nms %in% names(x)), silent = TRUE)
   t3 <- try(is.numeric(x$CN), silent = TRUE)
