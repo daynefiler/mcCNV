@@ -55,7 +55,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
   
   xpndCNV <- function(x, s) {
     d <- as.data.table(x@CNV.calls)
-    if (nrows(d) == 0) {
+    if (nrow(d) == 0) {
       return(data.table(int[0], 
                         type = vector(), 
                         nexons = vector(), 
