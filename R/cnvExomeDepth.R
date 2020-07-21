@@ -55,6 +55,16 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
   
   xpndCNV <- function(x, s) {
     d <- as.data.table(x@CNV.calls)
+    if (nrows(d) == 0) {
+      return(data.table(int[0], 
+                        type = vector(), 
+                        nexons = vector(), 
+                        BF = vector(),
+                        reads.expected = vector(),
+                        reads.observed = vector(),
+                        varID = vector(),
+                        subject = vector()))
+    }
     i1 <- d[ , unlist(mapply(seq, start.p, end.p, SIMPLIFY = FALSE))]
     d <- d[d[ , rep(.I, nexons)]]
     d <- d[ , .(type, nexons, BF, reads.expected, reads.observed, varID = id)]
