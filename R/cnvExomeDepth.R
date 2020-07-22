@@ -33,7 +33,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
                          n.bins.reduced = min(1e4, nrow(cmat)))
   }
   
-  refList <- mclapply(sbjVec, getRef, ...)
+  refList <- mclapply(sbjVec, getRef, mc.cores = 16)
   names(refList) <- sbjVec
   
   calcCN <- function(sbj) {
@@ -52,19 +52,19 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
     cn
   }
   
-  cnList <- mclapply(sbjVec, calcCN, ...)
+  cnList <- mclapply(sbjVec, calcCN, mc.cores = 16)
   
   xpndCNV <- function(x, s) {
     d <- as.data.table(x@CNV.calls)
     if (nrow(d) == 0) {
       return(data.table(int[0], 
-                        type = vector(), 
-                        nexons = vector(), 
-                        BF = vector(),
-                        reads.expected = vector(),
-                        reads.observed = vector(),
-                        varID = vector(),
-                        subject = vector()))
+                        type = character(), 
+                        nexons = numeric(), 
+                        BF = numeric(),
+                        reads.expected = integer(),
+                        reads.observed = integer(),
+                        varID = character(),
+                        subject = character()))
     }
     i1 <- d[ , unlist(mapply(seq, start.p, end.p, SIMPLIFY = FALSE))]
     d <- d[d[ , rep(.I, nexons)]]
@@ -74,7 +74,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
     d[]
   }
   
-  calls <- mcmapply(xpndCNV, x = cnList, s = sbjVec, SIMPLIFY = FALSE, ...)
+  calls <- mcmapply(xpndCNV, x = cnList, s = sbjVec, SIMPLIFY = FALSE, mc.cores = 16)
   calls <- rbindlist(calls)
   setkey(calls, subject, seqnames, start, end)
   setkey(counts, subject, seqnames, start, end)
@@ -92,7 +92,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
     tbl[]
   }
   
-  correlations <- rbindlist(mclapply(sbjVec, makeCorTbl, ...))
+  correlations <- rbindlist(mclapply(sbjVec, makeCorTbl, mc.cores = 16))
   setcolorder(correlations, "subject")
   
   list(calls = calls[], correlations = correlations[])
