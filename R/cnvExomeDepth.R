@@ -13,12 +13,11 @@
 #' the computation when available.
 #' 
 #' @import data.table
-#' @importFrom parallel mclapply mcmapply
 #' @importFrom ExomeDepth select.reference.set CallCNVs
 #' @importClassesFrom ExomeDepth ExomeDepth
 #' @export 
 
-cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
+cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4) {
   
   cmat <- cnvCountsToMatrix(counts)
   int <- unique(counts[ , .(seqnames, start, end)])
@@ -27,14 +26,22 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
   sbjVec <- colnames(cmat)
   
   getRef <- function(sbj) {
-    select.reference.set(test.counts = cmat[ , sbj],
-                         reference.counts = cmat[ , setdiff(sbjVec, sbj)],
-                         bin.length = int$end - int$start + 1,
-                         n.bins.reduced = min(1e4, nrow(cmat)))
+    try(select.reference.set(test.counts = cmat[ , sbj],
+                             reference.counts = cmat[ , setdiff(sbjVec, sbj)],
+                             bin.length = int$end - int$start + 1,
+                             n.bins.reduced = min(1e4, nrow(cmat))))
   }
   
-  refList <- mclapply(sbjVec, getRef, mc.cores = 16)
+  refList <- lapply(sbjVec, getRef)
   names(refList) <- sbjVec
+  
+  failed <- sapply(refList, is, 'try-error')
+  if (all(failed)) stop("ExomeDepth failed for all samples.")
+  if (any(failed)) {
+    refList <- refList[!failed]
+    warning('ExomeDepth failed for: ', setdiff(sbjVec, names(refList)))
+    sbjVec <- sbjVec[!failed]
+  }
   
   calcCN <- function(sbj) {
     ref <- rowSums(cmat[ , refList[[sbj]]$reference.choice, drop = FALSE])
@@ -52,7 +59,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
     cn
   }
   
-  cnList <- mclapply(sbjVec, calcCN, mc.cores = 16)
+  cnList <- lapply(sbjVec, calcCN)
   
   xpndCNV <- function(x, s) {
     d <- as.data.table(x@CNV.calls)
@@ -74,7 +81,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
     d[]
   }
   
-  calls <- mcmapply(xpndCNV, x = cnList, s = sbjVec, SIMPLIFY = FALSE, mc.cores = 16)
+  calls <- mapply(xpndCNV, x = cnList, s = sbjVec, SIMPLIFY = FALSE)
   calls <- rbindlist(calls)
   setkey(calls, subject, seqnames, start, end)
   setkey(counts, subject, seqnames, start, end)
@@ -92,7 +99,7 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
     tbl[]
   }
   
-  correlations <- rbindlist(mclapply(sbjVec, makeCorTbl, mc.cores = 16))
+  correlations <- rbindlist(lapply(sbjVec, makeCorTbl))
   setcolorder(correlations, "subject")
   
   list(calls = calls[], correlations = correlations[])
