@@ -37,9 +37,10 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
   names(refList) <- sbjVec
   
   calcCN <- function(sbj) {
+    ref <- rowSums(cmat[ , refList[[sbj]]$reference.choice, drop = FALSE])
     cn <- new('ExomeDepth', 
               test = cmat[ , sbj],
-              reference = rowSums(cmat[ , refList[[sbj]]$reference.choice]), 
+              reference = ref, 
               formula = 'cbind(test, reference) ~ 1')
     cn <- CallCNVs(x = cn, 
                    chromosome = int$seqnames, 
