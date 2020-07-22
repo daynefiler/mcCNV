@@ -86,7 +86,8 @@ cnvExomeDepth <- function(counts, transProb = 1e-4, cnvLength = 5e4, ...) {
     tbl <- as.data.table(refList[[sbj]]$summary.stats)
     tbl[ , subject := sbj]
     tbl[ , selected := ref.samples %in% refList[[sbj]]$reference.choice]
-    v <- cor(cmat[ , sbj], rowSums(cmat[ , refList[[sbj]]$reference.choice]))
+    ref <- rowSums(cmat[ , refList[[sbj]]$reference.choice, drop = FALSE])
+    v <- cor(cmat[ , sbj], ref)
     tbl[ , overallCor := v]
     tbl[]
   }
