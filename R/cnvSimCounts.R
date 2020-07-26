@@ -98,6 +98,8 @@ cnvSimCounts <- function(totalMolecules = 1e7L,
                   .(stop = max(.I), 
                     ind = unlist(mapply(seq, .I, length = vwid))),
                   by = seqnames]
+      ## Catch for seqnames lacking any CNVs, leading to NA in ind
+      ind <- ind[!is.na(ind)]
       ind[ , newCN := cnts[actCN != 1, unlist(mapply(rep, actCN, each = vwid))]]
       ind <- ind[ind <= stop]
       cnts[ind$ind, actCN := ind$newCN]
