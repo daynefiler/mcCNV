@@ -44,13 +44,8 @@
 ## .procReads: process reads from bam file, used in cnvGetCounts
 ##----------------------------------------------------------------------------##
 
-#' @importFrom IRanges IRanges findOverlapPairs
-#' @importClassesFrom IRanges IRanges
-#' @importFrom GenomicRanges GRanges ranges
-#' @importFrom GenomeInfoDb seqnames
-#' @importClassesFrom GenomicRanges GRanges
-#' @importFrom S4Vectors elementMetadata elementMetadata<-
-#' @importFrom stats rbinom
+#' @import data.table
+#' @importFrom stats rbinom mad median
 
 .procReads <- function(rds, int, verbose) {
   

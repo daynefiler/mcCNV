@@ -4,7 +4,7 @@
 \alias{cnvExomeDepth}
 \title{Run ExomeDepth on mcCNV counts object}
 \usage{
-cnvExomeDepth(counts, transProb = 1e-04, cnvLength = 50000, ...)
+cnvExomeDepth(counts, transProb = 1e-04, cnvLength = 50000)
 }
 \arguments{
 \item{counts}{data.table \link[=validObjects]{counts object}}

@@ -9,9 +9,8 @@ cnvSimCounts(
   interval = cnvSimInterval(),
   subject = "simulatedSubject",
   variantWidth = 1L,
-  CN = c(0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4),
-  cnProb = c(1e-06, 0.000625, 0.998747, 0.000625, 1e-06, 2.5e-07, 2.5e-07, 2.5e-07,
-    2.5e-07),
+  CN = c(0, 0.5, 1, 1.5, 2),
+  cnProb = c(0.00025, 0.00025, 0.999, 0.00025, 0.00025),
   seed = NULL
 )
 }

@@ -22,15 +22,13 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     Rsamtools,
-    dlfUtils,
     matrixStats,
     GenomicRanges,
+    GenomeInfoDb,
     IRanges,
     Rfast,
     parallel,
     stats,
-    IRanges,
-    GenomeInfoDb,
     utils
 Depends: 
     data.table (>= 1.12.8),

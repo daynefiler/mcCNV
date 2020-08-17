@@ -57,9 +57,8 @@ cnvSimCounts <- function(totalMolecules = 1e7L,
                          interval = cnvSimInterval(),
                          subject = "simulatedSubject",
                          variantWidth = 1L,
-                         CN = c(0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0), 
-                         cnProb = c(1e-6, 6.25e-4, 0.998747, 6.25e-4, 1e-6, 
-                                    2.5e-7, 2.5e-7, 2.5e-7, 2.5e-7),
+                         CN = c(0.0, 0.5, 1.0, 1.5, 2.0), 
+                         cnProb = c(2.5e-4, 2.5e-4, 0.999, 2.5e-4, 2.5e-4),
                          seed = NULL) {
   
   ## Input checks; the sample function rescales the 'prob' parameter, and the
