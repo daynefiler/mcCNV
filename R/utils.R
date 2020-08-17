@@ -176,7 +176,7 @@
   
   cnts[ , CN := 1]
   
-  cs <- c(0.001, 0.5, 1, 1.5, 2.0, 2.5)
+  cs <- c(0.001, 0.5, 1, 1.5, 2.0)
   nstates <- length(cs)
   if (prior > 1/nstates || prior < 0) {
     if (prior < 0) {
