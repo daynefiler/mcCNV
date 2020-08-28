@@ -196,12 +196,8 @@
     cnts[ , sf := median(adjN/geomn, na.rm = TRUE), by = list(subject, width)]
     cnts[ , mn := mean(adjN[use]/sf[use]), by = intName]
     cnts[ , vr :=  var(adjN[use]/sf[use]), by = intName]
-    
-    shrPhi <- cnts[ , 
-                    list(n = .N, mn = mn[1], vr = vr[1], isf = sum(1/sf)), 
-                    by = list(intName, width)]
-    # shrPhi[is.na(vr), vr := mn]
-    shrPhi[ , phi := (n*vr + mn*isf)/(mn^2*isf), by = intName]
+    shrPhi <- cnts[ , .(mn = mn[1], vr = vr[1]), by = .(intName, width)]
+    shrPhi[ , phi := (vr - mn)/(mn^2), by = intName]
     shrPhi[(phi < 0), phi := 0]
     if (shrink) shrPhi[!is.na(phi), phi := .calcShrPhi(phi), by = width]
     setkey(cnts, intName)
