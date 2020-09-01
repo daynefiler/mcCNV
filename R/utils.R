@@ -221,7 +221,7 @@
     nchng <- cnts[oldCN != CN, .N]
     chngVec[it] <- nchng
     
-    if (verbose) cat("iteration: ", it, ", ", nchng, "copy state changes\n")
+    if (verbose) cat("iteration:", it, ",", nchng, "copy state changes\n")
     
     if (nchng < delta | it == iterations) break
     

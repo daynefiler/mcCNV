@@ -6,10 +6,10 @@
 #' @title Call copy number-state for the given data
 #' 
 #' @param counts data.table [counts object][validObjects]
-#' @param width integer, window of contiguous intervals to calculate CN on; can 
-#' provide a vector with multiple widths (defaults to 1)
 #' @param prior numeric of length 1, the prior probability used to estimate
 #' copy number variants; see details
+#' @param width integer, window of contiguous intervals to calculate CN on; can 
+#' provide a vector with multiple widths (defaults to 1)
 #' @param delta integer of length 1, minimum copy number state changes to stop
 #' the algorithm; see details
 #' @param iterations integer of length 1, the maximum number of iterations 
@@ -23,7 +23,7 @@
 #' @export
 
 cnvCallCN <- function(counts, 
-                      prior, 
+                      prior = 0.2, 
                       width = 1L, 
                       delta = 20L, 
                       iterations = 30L, 
@@ -62,6 +62,9 @@ cnvCallCN <- function(counts,
   n1 <- c("intPhi", "intMean", "intVar", "intWidth", "sbjSizeFactor", 
           "cnLogLik", "cnLogP", "cn1LogP")
   setnames(calls, n0, n1)
+  
+  ## perform p-value correction
+  calls[ , passFilter := p.adjust(p = exp(cnv1Logp), method = "BH") < 0.05]
   
   calls[]
   
