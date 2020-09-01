@@ -165,7 +165,8 @@
 #' @importFrom stats dnbinom
 #' @import data.table
 
-.callCN <- function(cnts, delta, iterations, prior, shrink = TRUE) {
+.callCN <- function(cnts, delta, iterations, prior, shrink = TRUE, 
+                    verbose = TRUE) {
   
   # @param cnts data.table object containing the counts
   # @param prior numeric of length 1, the prior probability of having a CNV
@@ -173,6 +174,7 @@
   # state to stop the alogorithm 
   # @param iterations integer of length 1, the maximum number of iterations
   # @param shrink logical of length 1, shrinkage applied to phi when TRUE
+  # @param verbose logical of length 1, output info about iteration & #changes
   
   cnts[ , CN := 1]
   
@@ -218,6 +220,8 @@
     rm(probMat); gc()
     nchng <- cnts[oldCN != CN, .N]
     chngVec[it] <- nchng
+    
+    if (verbose) cat("iteration: ", it, ", ", nchng, "copy state changes\n")
     
     if (nchng < delta | it == iterations) break
     

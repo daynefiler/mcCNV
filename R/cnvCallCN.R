@@ -43,12 +43,13 @@ cnvCallCN <- function(counts,
   counts <- rbindlist(lapply(width, .clpsExon, dat = counts))
   if (verbose) cat("done.\n")
   
-  if (verbose) cat("Calling CNVs...")
+  if (verbose) cat("Calling CNVs...\n")
   calls <- .callCN(cnts = counts, 
                    delta = delta, 
                    iterations = iterations, 
                    prior = prior,
-                   shrink = TRUE)
+                   shrink = TRUE,
+                   verbose = verbose)
   if (verbose) cat("done.\n")
   
   ## Overwrite placeholder CN == 0.001; negate calls where a mean was not 
