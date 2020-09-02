@@ -64,7 +64,7 @@ cnvCallCN <- function(counts,
   setnames(calls, n0, n1)
   
   ## perform p-value correction
-  calls[ , passFilter := p.adjust(p = exp(cnv1LogP), method = "BH") < 0.05]
+  calls[ , passFilter := p.adjust(p = exp(cn1LogP), method = "BH") < 0.05]
   
   calls[]
   
