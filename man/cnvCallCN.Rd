@@ -6,6 +6,7 @@
 \usage{
 cnvCallCN(
   counts,
+  alpha = 0.05,
   prior = 0.2,
   width = 1L,
   delta = 20L,

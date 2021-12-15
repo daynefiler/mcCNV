@@ -15,7 +15,6 @@
 #' called a CNV
 #' 
 #' @import data.table
-#' @export
 
 cnvAggCall <- function(calls) {
   
